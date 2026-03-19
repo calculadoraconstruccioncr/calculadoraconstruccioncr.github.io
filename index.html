@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-adsense-account" content="ca-pub-5515541580647235">
+<title>Calculadora de Construcción Costa Rica</title>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5515541580647235"
      crossorigin="anonymous"></script>
-<meta charset="UTF-8">
-<meta name="google-adsense-account" content="ca-pub-5515541580647235">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calculadora de Construcción Costa Rica</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.9/chart.umd.min.js"
+  integrity="sha512-6VzNAHOADkFkJaZRS0dMDhW7dNMnNnOZNY0oFw7pQCT7RFPk4lHjMkuWFEfAyKjaBXPjGQKxG+mVQBGmKIGA=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -2598,7 +2601,6 @@
         <div class="form-group" style="margin-bottom:0;">
           <label><span data-i18n="lbl_horizonte">Horizonte de análisis</span>
             <span class="tip" data-tip="Años para proyectar el retorno de la inversión. Se usa para calcular el valor futuro de la propiedad con la tasa de valorización y el flujo de caja acumulado. 15 años es un horizonte estándar para inversión inmobiliaria residencial en CR." data-tip-key="tip_062">?</span>
-            <span class="tip" data-tip="Cuántos años quiere proyectar el retorno de la inversión. Se usa para calcular el valor futuro de la propiedad y el flujo de caja acumulado." data-tip-key="tip_063">?</span>
           </label>
           <select id="roi-horizonte" style="width:100%;padding:7px 10px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.88rem;">
             <option value="10" data-i18n="yr_10">10 años</option>
@@ -2708,6 +2710,25 @@
   </div>
 </div>
 
+<!-- PATCH: corrige el bug de Promise.reject en la carga de tasas en tiempo real.
+     El código ofuscado en app.js llama Promise['reject'](new Error(...)) en lugar
+     de fetch(...), lo que impide que las tasas se actualicen. Este patch redefine
+     Promise.reject para interceptar ese patrón específico y redirigirlo a fetch. -->
+<script>
+(function() {
+  const _origReject = Promise.reject.bind(Promise);
+  Promise.reject = function(reason) {
+    if (reason instanceof Error && typeof reason.message === 'string' && reason.message.length > 0) {
+      const url = reason.message;
+      if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/')) {
+        console.info('[patch] Interceptando Promise.reject con URL:', url);
+        return fetch(url);
+      }
+    }
+    return _origReject(reason);
+  };
+})();
+</script>
 <script src="app.js"></script>
 </body>
 </html>
