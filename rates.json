@@ -1,0 +1,17 @@
+{
+  "_comment": "Auto-actualizado por GitHub Actions. No editar manualmente.",
+  "updated": "2026-04-21T06:00:00Z",
+  "source": "BCCR + FRED + NY Fed",
+  "tbp":   3.66,
+  "ted":   3.12,
+  "tc":    473,
+  "prime": 6.75,
+  "sofr3": 3.71,
+  "sofr6": 3.95,
+  "tri3c": 3.35,
+  "tri6c": 5.38,
+  "tri12c": 6.25,
+  "tri3d": 2.98,
+  "tri6d": 3.35,
+  "tri12d": 4.19
+}
