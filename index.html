@@ -3000,6 +3000,40 @@ function iniciarCalculadora() {
   });
 })();
 
+// ── BOTÓN "ACTUALIZAR TASAS" MEJORADO ─────────────────
+// Primero carga rates.json (mismo origen, instantáneo — actualizado por GitHub Action).
+// Luego también ejecuta el fetch remoto de app.js para tasas en vivo.
+// Ambos sistemas coexisten: el botón da lo mejor de los dos mundos.
+window.addEventListener('load', function() {
+  var origRefresh = window.refreshRatesManual;
+
+  window.refreshRatesManual = function() {
+    var btn  = document.getElementById('btn-refresh-rates');
+    var icon = document.getElementById('refresh-icon');
+
+    // Animación del ícono durante la actualización
+    if (icon) icon.style.animation = 'rov-spin 0.75s linear infinite';
+    if (btn)  btn.disabled = true;
+
+    // 1. Leer rates.json del mismo origen (sin CORS, resultado inmediato)
+    var jsonPromise = (typeof reloadRates === 'function')
+      ? new Promise(function(resolve) { reloadRates(); setTimeout(resolve, 400); })
+      : Promise.resolve();
+
+    // 2. Ejecutar fetch en vivo de app.js (CORS cascade para tasas actualizadas al minuto)
+    jsonPromise.then(function() {
+      if (typeof origRefresh === 'function') {
+        try { origRefresh(); } catch(e) { /* silencioso */ }
+      }
+      // Restaurar botón después de 4 segundos
+      setTimeout(function() {
+        if (icon) icon.style.animation = '';
+        if (btn)  btn.disabled = false;
+      }, 4000);
+    });
+  };
+});
+
 // Ensure overlay is never shown (removed from HTML but JS may reference it)
 window.addEventListener('DOMContentLoaded', function() {
   var ov = document.getElementById('rates-overlay');
