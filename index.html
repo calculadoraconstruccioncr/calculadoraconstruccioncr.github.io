@@ -2980,8 +2980,9 @@ function iniciarCalculadora() {
   function applyEditorialLang() {
     var lang = (typeof state !== 'undefined' && state.lang) ? state.lang : 'es';
     document.body.classList.toggle('lang-en', lang === 'en');
-    // Update html lang attribute for accessibility
     document.documentElement.lang = lang === 'en' ? 'en' : 'es';
+    // Persist so privacy.html and other pages can read it
+    try { localStorage.setItem('calc-cr-lang', lang); } catch(e) {}
   }
 
   // Wait for app.js to define toggleLang, then wrap it
