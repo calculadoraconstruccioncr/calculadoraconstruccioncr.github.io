@@ -52,8 +52,7 @@ jobs:
           # Token gratuito: registrar en https://gee.bccr.fi.cr
           # ─────────────────────────────────────────────────────────────
           BCCR_URL = (
-              'https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/'
-              'wsindicadoreseconomicos.asmx/ObtenerIndicadoresEconomicosXML'
+              'https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/wsindicadoreseconomicos.asmx/ObtenerIndicadoresEconomicosXML'
           )
 
           def bccr_fetch(indicator_code):
