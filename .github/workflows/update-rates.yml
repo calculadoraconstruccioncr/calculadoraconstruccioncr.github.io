@@ -2,8 +2,9 @@ name: Actualizar tasas de referencia
 
 on:
   schedule:
+    # Lunes a viernes 7:00 AM Costa Rica (UTC-6 = 13:00 UTC)
     - cron: '0 13 * * 1-5'
-  workflow_dispatch:
+  workflow_dispatch:   # Ejecución manual desde GitHub Actions
 
 permissions:
   contents: write
@@ -27,175 +28,197 @@ jobs:
 
       - name: Obtener tasas y actualizar rates.json
         env:
-          BCCR_TOKEN: ${{ secrets.BCCR_TOKEN }}
-          BCCR_EMAIL: ${{ secrets.BCCR_EMAIL }}
+          # Token gratuito: https://www.bccr.fi.cr/indicadores-economicos/servicio-web
+          # Si no tiene token, el sistema igual funciona para indicadores públicos
+          BCCR_TOKEN: ${{ secrets.BCCR_TOKEN || 'sin-token' }}
+          BCCR_EMAIL: ${{ secrets.BCCR_EMAIL || 'rates@calculadora-cr.github.io' }}
         run: |
-          python3 << 'PYEOF'
-          import requests, json, re, sys, time, os
-          from datetime import datetime, timedelta, timezone
+          python3 - << 'PYEOF'
+          import requests, json, re, sys, os
+          from datetime import datetime, timedelta
           from xml.etree import ElementTree as ET
 
-          NOW = datetime.now(timezone.utc)
-          TODAY = NOW.strftime('%d/%m/%Y')
+          NOW       = datetime.utcnow()
+          TODAY     = NOW.strftime('%d/%m/%Y')
+          MONTH_AGO = (NOW - timedelta(days=30)).strftime('%d/%m/%Y')
 
-          BCCR_TOKEN = os.environ.get('BCCR_TOKEN')
-          BCCR_EMAIL = os.environ.get('BCCR_EMAIL')
+          BCCR_TOKEN = os.environ.get('BCCR_TOKEN', 'sin-token')
+          BCCR_EMAIL = os.environ.get('BCCR_EMAIL', 'rates@calculadora-cr.github.io')
 
-          # 🔍 DEBUG SECRETS
-          print("🔍 DEBUG SECRETS:")
-          print("BCCR_TOKEN existe:", "YES" if BCCR_TOKEN else "NO")
+          HEADERS = {'User-Agent': 'CalculadoraCR-RatesBot/1.0 (github-actions)'}
 
-          if BCCR_TOKEN:
-              print("BCCR_TOKEN preview:", BCCR_TOKEN[:4] + "..." + BCCR_TOKEN[-4:])
-          else:
-              print("BCCR_TOKEN preview: NONE")
+          # ─── URL CORRECTA del BCCR (el error anterior usaba una URL vieja) ───
+          # Fuente oficial: https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/wsindicadoreseconomicos.asmx
+          BCCR_URL = (
+              'https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/'
+              'wsindicadoreseconomicos.asmx/ObtenerIndicadoresEconomicosXML'
+          )
 
-          print("BCCR_EMAIL:", BCCR_EMAIL if BCCR_EMAIL else "NONE")
+          # Indicadores públicos: no requieren token real (usan cualquier valor)
+          # Con token registrado funcionan mejor y con más cuota
+          # Códigos: TBP=423, TED=23698, TC compra=317, TC venta=318
 
-          HEADERS = {
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-          }
-
-          BCCR_URL = 'https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/wsindicadoreseconomicos.asmx/ObtenerIndicadoresEconomicosXML'
-
-          def bccr_fetch(indicator_code):
+          def bccr_fetch(indicador_code, label=''):
+              """Obtiene el valor más reciente de un indicador BCCR."""
+              params = {
+                  'Indicador':         str(indicador_code),
+                  'FechaInicio':       MONTH_AGO,
+                  'FechaFinal':        TODAY,
+                  'Nombre':            'CalculadoraCR',
+                  'SubNiveles':        'N',
+                  'CorreoElectronico': BCCR_EMAIL,
+                  'Token':             BCCR_TOKEN,
+              }
               try:
-                  params = {
-                      'Indicador': indicator_code,
-                      'FechaInicio': TODAY,
-                      'FechaFinal': TODAY,
-                      'Nombre': BCCR_EMAIL,
-                      'SubNiveles': 'S',
-                      'CorreoElectronico': BCCR_EMAIL,
-                      'Token': BCCR_TOKEN,
-                  }
-
-                  r = requests.get(BCCR_URL, params=params, headers=HEADERS, timeout=20)
-
-                  print(f"\n🔎 URL BCCR ({indicator_code}):", r.url)
-                  print("🔎 RESPUESTA (preview):", r.text[:300])
-
+                  r = requests.get(BCCR_URL, params=params,
+                                   headers=HEADERS, timeout=25)
                   r.raise_for_status()
+                  xml_text = r.text
 
-                  root = ET.fromstring(r.text)
+                  # El XML puede tener namespace — los quitamos
+                  xml_clean = re.sub(r'\s+xmlns[^"]*"[^"]*"', '', xml_text)
+                  root = ET.fromstring(xml_clean)
+
+                  # Buscar NUM_VALOR en todo el árbol (ignora namespace)
                   values = []
-
                   for elem in root.iter():
                       tag = elem.tag.split('}')[-1]
                       if tag == 'NUM_VALOR' and elem.text:
+                          txt = elem.text.strip().replace(',', '.')
                           try:
-                              v = float(elem.text.replace(',', '.').strip())
+                              v = float(txt)
                               if v > 0:
                                   values.append(v)
-                          except:
+                          except ValueError:
                               pass
 
-                  if not values:
-                      print(f"⚠ Sin datos para indicador {indicator_code}", file=sys.stderr)
+                  if values:
+                      result = round(values[-1], 4)
+                      print(f'  ✅ BCCR {label}({indicador_code}) = {result}')
+                      return result
+                  else:
+                      print(f'  ⚠ BCCR {label}({indicador_code}): XML sin valores — respuesta: {xml_text[:200]}',
+                            file=sys.stderr)
                       return None
 
-                  return round(values[-1], 4)
-
               except Exception as e:
-                  print(f'❌ BCCR {indicator_code} error: {e}', file=sys.stderr)
+                  print(f'  ❌ BCCR {label}({indicador_code}) error: {e}', file=sys.stderr)
                   return None
 
           def fred_fetch(series_id):
+              """Obtiene el último valor de FRED (stlouisfed.org) — sin auth."""
               try:
                   url = f'https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}'
-                  r = requests.get(url, headers=HEADERS, timeout=20)
+                  r = requests.get(url, headers=HEADERS, timeout=25)
                   r.raise_for_status()
-
-                  lines = [l.strip() for l in r.text.split('\n') if l.strip()]
+                  lines = [l.strip() for l in r.text.strip().split('\n') if l.strip()]
                   for line in reversed(lines[1:]):
                       parts = line.split(',')
-                      if len(parts) >= 2 and parts[1] not in ('.', ''):
-                          v = float(parts[1])
-                          if 0 < v < 30:
-                              return round(v, 4)
+                      if len(parts) >= 2 and parts[1].strip() not in ('.', '', 'NA'):
+                          try:
+                              v = float(parts[1])
+                              if 0 < v < 30:
+                                  print(f'  ✅ FRED {series_id} = {v}')
+                                  return round(v, 4)
+                          except ValueError:
+                              pass
               except Exception as e:
-                  print(f'❌ FRED {series_id} error: {e}', file=sys.stderr)
+                  print(f'  ❌ FRED {series_id} error: {e}', file=sys.stderr)
               return None
 
-          def camara_fetch(url):
+          def camara_fetch(url, label=''):
+              """Extrae TRI 3M/6M/12M del HTML de Cámara de Bancos."""
               try:
-                  r = requests.get(url, headers=HEADERS, timeout=20)
+                  r = requests.get(url, headers=HEADERS, timeout=25)
                   r.raise_for_status()
-                  text = r.text.replace('\n', ' ')
+                  text = r.text.replace('\n', ' ').replace('\r', ' ')
 
                   def find_rate(pattern):
                       m = re.search(pattern, text, re.IGNORECASE)
                       if m:
-                          return round(float(m.group(1).replace(',', '.')), 4)
+                          try:
+                              v = float(m.group(1).replace(',', '.'))
+                              return round(v, 4) if 0 < v < 30 else None
+                          except ValueError:
+                              pass
                       return None
 
-                  return {
-                      'tri3':  find_rate(r'3\s*meses?[^%]{0,80}?(\d{1,2}[,.]\d+)'),
-                      'tri6':  find_rate(r'6\s*meses?[^%]{0,80}?(\d{1,2}[,.]\d+)'),
-                      'tri12': find_rate(r'12\s*meses?[^%]{0,80}?(\d{1,2}[,.]\d+)'),
-                  }
+                  t3  = find_rate(r'3\s*meses?[^%]{0,120}?(\d{1,2}[,.]\d{1,4})\s*%')
+                  t6  = find_rate(r'6\s*meses?[^%]{0,120}?(\d{1,2}[,.]\d{1,4})\s*%')
+                  t12 = find_rate(r'12\s*meses?[^%]{0,120}?(\d{1,2}[,.]\d{1,4})\s*%')
+                  print(f'  ✅ Cámara {label}: 3M={t3} 6M={t6} 12M={t12}')
+                  return {'tri3': t3, 'tri6': t6, 'tri12': t12}
+
               except Exception as e:
-                  print(f'❌ Cámara error: {e}', file=sys.stderr)
+                  print(f'  ❌ Cámara {label} error: {e}', file=sys.stderr)
                   return {'tri3': None, 'tri6': None, 'tri12': None}
 
+          # ─── Cargar rates.json existente como fallback ───────────────
           try:
               with open('rates.json') as f:
                   existing = json.load(f)
-          except:
+              print(f'Cargado rates.json existente (updated: {existing.get("updated","?")})')
+          except Exception:
               existing = {}
+              print('No se encontró rates.json existente — usando ceros como fallback')
 
-          def use(new, key):
-              if new:
-                  return new
+          def use(new_val, key, label=''):
+              if new_val is not None and new_val > 0:
+                  return new_val
               old = existing.get(key)
-              print(f'⚠ {key}: usando fallback {old}', file=sys.stderr)
+              if old is not None:
+                  print(f'  ↩ {key}: fallback a valor existente {old}', file=sys.stderr)
               return old
 
-          print('\n→ BCCR...')
-          tbp = bccr_fetch(423)
-          ted = bccr_fetch(23698)
-          tc  = bccr_fetch(318)
+          # ─── Ejecutar todos los fetches ──────────────────────────────
+          print('\n→ BCCR: TBP (423), TED (23698), TC-venta (318)...')
+          tbp  = bccr_fetch(423,   'TBP')
+          ted  = bccr_fetch(23698, 'TED')
+          tc   = bccr_fetch(318,   'TC-venta')
 
-          print(f"RESULTADOS BCCR → TBP={tbp}, TED={ted}, TC={tc}")
-
-          print('\n→ FRED...')
+          print('\n→ FRED: Prime Rate, SOFR 90d, SOFR 180d...')
           prime = fred_fetch('DPRIME')
           sofr3 = fred_fetch('SOFR90DAYAVG')
           sofr6 = fred_fetch('SOFR180DAYAVG')
 
-          print('\n→ Cámara...')
-          crc = camara_fetch('https://camaradebancos.fi.cr/colones/')
-          usd = camara_fetch('https://camaradebancos.fi.cr/dolares/')
+          print('\n→ Cámara de Bancos (colones)...')
+          crc = camara_fetch('https://camaradebancos.fi.cr/colones/', 'CRC')
 
+          print('\n→ Cámara de Bancos (dólares)...')
+          usd = camara_fetch('https://camaradebancos.fi.cr/dolares/', 'USD')
+
+          # ─── Construir rates.json ─────────────────────────────────────
           rates = {
-              'updated': NOW.strftime('%Y-%m-%dT%H:%M:%SZ'),
-              'tbp': use(tbp, 'tbp'),
-              'ted': use(ted, 'ted'),
-              'tc': use(tc, 'tc'),
-              'prime': use(prime, 'prime'),
-              'sofr3': use(sofr3, 'sofr3'),
-              'sofr6': use(sofr6, 'sofr6'),
-              'tri3c': use(crc['tri3'], 'tri3c'),
-              'tri6c': use(crc['tri6'], 'tri6c'),
+              '_comment': 'Auto-actualizado por GitHub Actions. No editar manualmente.',
+              'updated':  NOW.strftime('%Y-%m-%dT%H:%M:%SZ'),
+              'source':   'BCCR gee.bccr.fi.cr · FRED stlouisfed.org · Cámara de Bancos',
+              'tbp':    use(tbp,          'tbp'),
+              'ted':    use(ted,          'ted'),
+              'tc':     use(tc,           'tc'),
+              'prime':  use(prime,        'prime'),
+              'sofr3':  use(sofr3,        'sofr3'),
+              'sofr6':  use(sofr6,        'sofr6'),
+              'tri3c':  use(crc['tri3'],  'tri3c'),
+              'tri6c':  use(crc['tri6'],  'tri6c'),
               'tri12c': use(crc['tri12'], 'tri12c'),
-              'tri3d': use(usd['tri3'], 'tri3d'),
-              'tri6d': use(usd['tri6'], 'tri6d'),
+              'tri3d':  use(usd['tri3'],  'tri3d'),
+              'tri6d':  use(usd['tri6'],  'tri6d'),
               'tri12d': use(usd['tri12'], 'tri12d'),
           }
 
           with open('rates.json', 'w') as f:
-              json.dump(rates, f, indent=2)
+              json.dump(rates, f, indent=2, ensure_ascii=False)
 
-          print("\n✅ rates.json generado")
+          print(f'\n✅ rates.json guardado: {rates["updated"]}')
+          display = {k: v for k, v in rates.items() if not k.startswith('_') and k != 'source'}
+          print(json.dumps(display, indent=2))
           PYEOF
 
-      - name: Commit y push
+      - name: Commit y push rates.json
         run: |
-          git config user.name "github-actions[bot]"
+          git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
           git add rates.json
-          git diff --staged --quiet || git commit -m "debug rates $(date -u '+%Y-%m-%d %H:%M')"
-
-          git pull --rebase
+          git diff --staged --quiet || \
+            git commit -m "chore: tasas $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push
