@@ -1,0 +1,225 @@
+name: Actualizar tasas de referencia
+
+on:
+  schedule:
+    # Lunes a viernes a las 7:00 AM hora CR (13:00 UTC, CR = UTC-6)
+    - cron: '0 13 * * 1-5'
+  workflow_dispatch:   # Permite ejecutar manualmente desde GitHub
+
+permissions:
+  contents: write    # Necesario para hacer commit de rates.json
+
+jobs:
+  update-rates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependencias
+        run: pip install requests lxml --quiet
+
+      - name: Obtener tasas y actualizar rates.json
+        env:
+          BCCR_TOKEN: ${{ secrets.BCCR_TOKEN }}
+          BCCR_EMAIL: ${{ secrets.BCCR_EMAIL }}
+        run: |
+          python3 << 'PYEOF'
+          import requests, json, re, sys
+          from datetime import datetime, timedelta
+          from xml.etree import ElementTree as ET
+
+          NOW   = datetime.utcnow()
+          TODAY = NOW.strftime('%d/%m/%Y')
+          MONTH_AGO = (NOW - timedelta(days=30)).strftime('%d/%m/%Y')
+
+          import os
+          BCCR_TOKEN = os.environ.get('BCCR_TOKEN', 'NONE')
+          BCCR_EMAIL = os.environ.get('BCCR_EMAIL', 'rates@calculadora-cr.github.io')
+
+          HEADERS = {'User-Agent': 'CalculadoraCR-RatesBot/1.0'}
+
+          # ─────────────────────────────────────────────────────────────
+          # BCCR API  (gee.bccr.fi.cr)
+          # Indicadores: TBP=423, TED=23698, TC_COMPRA=318, TC_VENTA=317
+          # Token gratuito: registrar en https://gee.bccr.fi.cr
+          # ─────────────────────────────────────────────────────────────
+          BCCR_URL = (
+              'https://gee.bccr.fi.cr/indicadoresEconomicos/WSe/'
+              'wseIndicadoresEconomicos.asmx/ObtenerIndicadoresEconomicosXML'
+          )
+
+          def bccr_fetch(indicator_code):
+              """Devuelve el valor más reciente del indicador BCCR."""
+              try:
+                  params = {
+                      'Indicador':           indicator_code,
+                      'FechaInicio':         MONTH_AGO,
+                      'FechaFinal':          TODAY,
+                      'Nombre':              'calculadora-cr',
+                      'SubNiveles':          'S',
+                      'CorreoElectronico':   BCCR_EMAIL,
+                      'Token':               BCCR_TOKEN,
+                  }
+                  r = requests.get(BCCR_URL, params=params,
+                                   headers=HEADERS, timeout=20)
+                  r.raise_for_status()
+
+                  # El XML devuelve elementos con NUM_VALOR
+                  root = ET.fromstring(r.text)
+                  values = []
+                  for elem in root.iter():
+                      tag = elem.tag.split('}')[-1]  # quita namespace
+                      if tag == 'NUM_VALOR' and elem.text:
+                          try:
+                              v = float(elem.text.replace(',', '.').strip())
+                              if v > 0:
+                                  values.append(v)
+                          except ValueError:
+                              pass
+
+                  return round(values[-1], 4) if values else None
+
+              except Exception as e:
+                  print(f'  BCCR {indicator_code} error: {e}', file=sys.stderr)
+                  return None
+
+          # ─────────────────────────────────────────────────────────────
+          # FRED API  (stlouisfed.org) — sin autenticación
+          # ─────────────────────────────────────────────────────────────
+          def fred_fetch(series_id):
+              """Devuelve el último valor de una serie de FRED."""
+              try:
+                  url = f'https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}'
+                  r = requests.get(url, headers=HEADERS, timeout=20)
+                  r.raise_for_status()
+                  lines = [l.strip() for l in r.text.split('\n') if l.strip()]
+                  # Busca el último valor no-nulo de atrás hacia adelante
+                  for line in reversed(lines[1:]):
+                      parts = line.split(',')
+                      if len(parts) >= 2 and parts[1].strip() not in ('.', ''):
+                          try:
+                              v = float(parts[1])
+                              if 0 < v < 30:
+                                  return round(v, 4)
+                          except ValueError:
+                              pass
+              except Exception as e:
+                  print(f'  FRED {series_id} error: {e}', file=sys.stderr)
+              return None
+
+          # ─────────────────────────────────────────────────────────────
+          # Cámara de Bancos — TRI (scraping HTML)
+          # ─────────────────────────────────────────────────────────────
+          def camara_fetch(url):
+              """Extrae tasas TRI 3M/6M/12M del HTML de Cámara de Bancos."""
+              try:
+                  r = requests.get(url, headers=HEADERS, timeout=20)
+                  r.raise_for_status()
+                  text = r.text.replace('\n', ' ').replace('\r', ' ')
+
+                  def find_rate(pattern):
+                      m = re.search(pattern, text, re.IGNORECASE)
+                      if m:
+                          try:
+                              v = float(m.group(1).replace(',', '.'))
+                              return round(v, 4) if 0 < v < 30 else None
+                          except ValueError:
+                              pass
+                      return None
+
+                  return {
+                      'tri3':  find_rate(r'3\s*meses?[^%]{0,80}?(\d{1,2}[,.]\d{1,4})\s*%'),
+                      'tri6':  find_rate(r'6\s*meses?[^%]{0,80}?(\d{1,2}[,.]\d{1,4})\s*%'),
+                      'tri12': find_rate(r'12\s*meses?[^%]{0,80}?(\d{1,2}[,.]\d{1,4})\s*%'),
+                  }
+              except Exception as e:
+                  print(f'  Cámara {url} error: {e}', file=sys.stderr)
+                  return {'tri3': None, 'tri6': None, 'tri12': None}
+
+          # ─────────────────────────────────────────────────────────────
+          # Cargar rates.json existente como fallback
+          # ─────────────────────────────────────────────────────────────
+          try:
+              with open('rates.json') as f:
+                  existing = json.load(f)
+          except Exception:
+              existing = {}
+
+          def use(new_val, key):
+              """Usa new_val si es válido, si no usa el valor existente."""
+              if new_val is not None and new_val > 0:
+                  return new_val
+              old = existing.get(key)
+              if old is not None:
+                  print(f'  ⚠ {key}: usando valor existente {old}', file=sys.stderr)
+              return old
+
+          # ─────────────────────────────────────────────────────────────
+          # Fetch de todas las fuentes
+          # ─────────────────────────────────────────────────────────────
+          print('→ Fetching BCCR: TBP (423), TED (23698), TC (318)...')
+          tbp  = bccr_fetch(423)
+          ted  = bccr_fetch(23698)
+          tc   = bccr_fetch(318)
+          print(f'  TBP={tbp}  TED={ted}  TC={tc}')
+
+          print('→ Fetching FRED: DPRIME, SOFR90DAYAVG, SOFR180DAYAVG...')
+          prime = fred_fetch('DPRIME')
+          sofr3 = fred_fetch('SOFR90DAYAVG')
+          sofr6 = fred_fetch('SOFR180DAYAVG')
+          print(f'  PRIME={prime}  SOFR3={sofr3}  SOFR6={sofr6}')
+
+          print('→ Fetching Cámara de Bancos (colones)...')
+          crc = camara_fetch('https://camaradebancos.fi.cr/colones/')
+          print(f'  CRC: {crc}')
+
+          print('→ Fetching Cámara de Bancos (dólares)...')
+          usd = camara_fetch('https://camaradebancos.fi.cr/dolares/')
+          print(f'  USD: {usd}')
+
+          # ─────────────────────────────────────────────────────────────
+          # Construir rates.json con fallbacks al valor existente
+          # ─────────────────────────────────────────────────────────────
+          rates = {
+              '_comment': 'Auto-actualizado por GitHub Actions. No editar manualmente.',
+              'updated':  NOW.strftime('%Y-%m-%dT%H:%M:%SZ'),
+              'source':   'BCCR gee.bccr.fi.cr · FRED stlouisfed.org · Cámara de Bancos',
+              'tbp':      use(tbp,          'tbp'),
+              'ted':      use(ted,          'ted'),
+              'tc':       use(tc,           'tc'),
+              'prime':    use(prime,        'prime'),
+              'sofr3':    use(sofr3,        'sofr3'),
+              'sofr6':    use(sofr6,        'sofr6'),
+              'tri3c':    use(crc['tri3'],  'tri3c'),
+              'tri6c':    use(crc['tri6'],  'tri6c'),
+              'tri12c':   use(crc['tri12'], 'tri12c'),
+              'tri3d':    use(usd['tri3'],  'tri3d'),
+              'tri6d':    use(usd['tri6'],  'tri6d'),
+              'tri12d':   use(usd['tri12'], 'tri12d'),
+          }
+
+          with open('rates.json', 'w') as f:
+              json.dump(rates, f, indent=2, ensure_ascii=False)
+
+          print(f'\n✅ rates.json actualizado: {rates["updated"]}')
+          print(json.dumps({k: v for k, v in rates.items()
+                            if not k.startswith('_') and k != 'source'}, indent=2))
+          PYEOF
+
+      - name: Commit y push rates.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add rates.json
+          # Solo hace commit si hay cambios
+          git diff --staged --quiet || \
+            git commit -m "chore: actualizar tasas $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push
