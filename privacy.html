@@ -6,97 +6,203 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Política de Privacidad – Calculadora de Construcción Costa Rica</title>
   <meta name="description" content="Política de privacidad de Calculadora de Construcción Costa Rica. Conoce cómo tratamos tu información.">
+  <link rel="canonical" href="https://calculadoraconstruccioncr.github.io/privacy.html">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'DM Sans', sans-serif; background: #f9fafb; color: #1a1d23; line-height: 1.7; }
+    :root {
+      --green-800: #145a32; --green-600: #27ae60; --green-50: #eafaf1;
+      --gray-900: #1a1d23; --gray-500: #6b7280; --gray-200: #e5e7eb;
+      --gray-50: #f9fafb;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--gray-50); color: var(--gray-900); line-height: 1.7; }
     nav {
       position: sticky; top: 0; z-index: 100;
       background: rgba(255,255,255,0.96); backdrop-filter: blur(16px);
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid var(--gray-200);
       padding: 0 24px; min-height: 52px;
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
     }
-    .nav-brand { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; color: #145a32; font-weight: 600; text-decoration: none; }
-    .logo-dot { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, #27ae60, #145a32); display: flex; align-items: center; justify-content: center; font-size: 15px; }
-    .container { max-width: 760px; margin: 0 auto; padding: 60px 24px 80px; }
-    h1 { font-size: 2rem; color: #145a32; margin-bottom: 8px; }
-    .subtitle { color: #6b7280; margin-bottom: 40px; font-size: 0.95rem; }
-    h2 { font-size: 1.2rem; color: #1a1d23; margin: 36px 0 12px; font-weight: 600; }
-    p, li { color: #374151; font-size: 0.97rem; margin-bottom: 12px; }
-    ul { padding-left: 20px; }
-    a { color: #27ae60; }
-    .highlight-box {
-      background: #f0fdf4; border: 1px solid #86efac; border-radius: 12px;
-      padding: 20px 24px; margin: 24px 0;
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.15rem; color: var(--green-800); text-decoration: none; flex-shrink: 0;
     }
-    footer { text-align: center; padding: 32px 24px; color: #9ca3af; font-size: 0.85rem; border-top: 1px solid #e5e7eb; margin-top: 40px; }
+    .logo-dot {
+      width: 32px; height: 32px; border-radius: 9px;
+      background: linear-gradient(135deg, var(--green-600), var(--green-800));
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-back { color: var(--green-600); font-size: 0.88rem; text-decoration: none; font-weight: 600; white-space: nowrap; }
+    .nav-back:hover { text-decoration: underline; }
+    #lang-btn {
+      background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 20px;
+      padding: 4px 14px; font-size: 0.75rem; font-weight: 700; cursor: pointer;
+      color: #166534; white-space: nowrap; font-family: 'DM Sans', sans-serif;
+    }
+    #lang-btn:hover { background: #dcfce7; }
+    .container { max-width: 760px; margin: 0 auto; padding: 56px 24px 80px; }
+    h1 { font-family: 'Instrument Serif', serif; font-size: 2.2rem; color: var(--green-800); margin-bottom: 8px; line-height: 1.2; }
+    .subtitle { color: var(--gray-500); margin-bottom: 36px; font-size: 0.92rem; }
+    h2 { font-size: 1.05rem; color: var(--gray-900); margin: 32px 0 10px; font-weight: 700; padding-left: 12px; border-left: 3px solid var(--green-600); }
+    p, li { color: #374151; font-size: 0.95rem; margin-bottom: 12px; line-height: 1.75; }
+    ul { padding-left: 20px; margin-bottom: 12px; }
+    li { margin-bottom: 6px; }
+    a { color: var(--green-600); }
+    a:hover { text-decoration: underline; }
+    code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 0.88em; }
+    .highlight-box { background: var(--green-50); border: 1px solid #86efac; border-radius: 12px; padding: 18px 22px; margin: 24px 0; }
+    .highlight-box p { margin-bottom: 0; }
+    /* Language toggle */
+    .lang-en { display: none; }
+    body.is-en .lang-en { display: block; }
+    body.is-en .lang-es { display: none; }
+    footer { text-align: center; padding: 28px 24px; color: var(--gray-500); font-size: 0.82rem; border-top: 1px solid var(--gray-200); background: white; }
+    footer a { color: var(--green-600); text-decoration: none; }
+    @media (max-width: 500px) { .container { padding: 32px 16px 60px; } h1 { font-size: 1.7rem; } }
   </style>
 </head>
 <body>
-  <nav>
-    <a href="index.html" class="nav-brand">
-      <div class="logo-dot">🏗️</div>
-      Calculadora CR
+
+<nav>
+  <a href="index.html" class="nav-brand">
+    <div class="logo-dot">🏠</div>
+    Calculadora CR
+  </a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">
+      <span class="lang-es">← Volver a la calculadora</span>
+      <span class="lang-en">← Back to calculator</span>
     </a>
-    <a href="index.html" style="color: #27ae60; font-size: 0.9rem; text-decoration: none;">← Volver a la calculadora</a>
-  </nav>
+    <button id="lang-btn" onclick="togglePrivacyLang()">🌐 English</button>
+  </div>
+</nav>
 
-  <div class="container">
+<div class="container">
+
+  <!-- ═══════════ ESPAÑOL ═══════════ -->
+  <div class="lang-es">
     <h1>Política de Privacidad</h1>
-    <p class="subtitle">Última actualización: marzo 2026</p>
-
+    <p class="subtitle">Última actualización: abril 2026</p>
     <div class="highlight-box">
       <p><strong>Resumen rápido:</strong> Esta herramienta no recolecta ni almacena datos personales en servidores propios. Todos los cálculos se realizan en tu navegador.</p>
     </div>
-
     <h2>1. Quiénes somos</h2>
-    <p>Calculadora de Construcción Costa Rica es una herramienta web gratuita que permite estimar costos de construcción en Costa Rica. Opera como sitio estático publicado en GitHub Pages.</p>
-
+    <p>Calculadora de Construcción Costa Rica es una herramienta web gratuita para estimar costos de construcción en Costa Rica. Opera como sitio estático en GitHub Pages sin base de datos propia.</p>
     <h2>2. Datos que recopilamos</h2>
-    <p>Esta herramienta <strong>no recopila datos personales directamente</strong>. No hay formularios de registro, cuentas de usuario ni bases de datos propias.</p>
-    <p>Los únicos datos que pueden recopilarse son:</p>
+    <p>Esta herramienta <strong>no recopila datos personales directamente</strong>. No hay formularios de registro, cuentas de usuario ni bases de datos propias. Los únicos datos que pueden recopilarse son:</p>
     <ul>
       <li>Datos de uso anónimos mediante <strong>Google Analytics</strong> (si aplica), sujetos a la política de Google.</li>
       <li>Datos de navegación mediante <strong>Google AdSense</strong> para mostrar anuncios relevantes.</li>
-      <li>Datos técnicos de acceso (dirección IP, navegador, país) registrados por los servidores de GitHub Pages de forma estándar.</li>
+      <li>Datos técnicos estándar (IP, navegador, país) registrados por GitHub Pages.</li>
     </ul>
-
     <h2>3. Google AdSense y cookies</h2>
-    <p>Este sitio utiliza Google AdSense para mostrar publicidad. Google puede usar cookies para personalizar los anuncios según tu historial de navegación. Puedes controlar esto en:</p>
+    <p>Este sitio usa Google AdSense. Google puede usar cookies para personalizar anuncios según tu historial de navegación. Puedes controlar esto en:</p>
     <ul>
       <li><a href="https://adssettings.google.com" target="_blank" rel="noopener">Configuración de anuncios de Google</a></li>
-      <li><a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener">About Ads – opt out</a></li>
+      <li><a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener">About Ads – inhabilitar personalización</a></li>
     </ul>
-    <p>Google es un proveedor externo que utiliza cookies DART para publicar anuncios basados en visitas previas de los usuarios a este sitio web y a otros sitios de Internet. Puedes inhabilitar el uso de la cookie DART visitando la política de privacidad de la red de contenido y anuncios de Google.</p>
-
+    <p>Google usa cookies DART basadas en visitas previas. Puedes inhabilitarlas en la <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">política de privacidad de Google</a>.</p>
     <h2>4. Cookies de terceros</h2>
-    <p>Nuestros socios publicitarios externos pueden usar cookies para servir anuncios relevantes. Estos proveedores externos tienen sus propias políticas de privacidad:</p>
+    <p>Nuestro único proveedor externo de publicidad es Google AdSense. No utilizamos ninguna otra red publicitaria.</p>
     <ul>
       <li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google LLC – Política de privacidad</a></li>
     </ul>
-
-    <h2>5. Datos financieros ingresados</h2>
-    <p>Los valores que ingresas en la calculadora (área, presupuesto, etc.) se procesan <strong>únicamente en tu dispositivo</strong> (JavaScript del navegador). No se envían a ningún servidor nuestro.</p>
-    <p>Las tasas de interés se obtienen en tiempo real desde fuentes públicas (BCCR, FRED) mediante APIs abiertas, sin transmitir datos del usuario.</p>
-
+    <h2 id="cookies">5. Datos financieros ingresados</h2>
+    <p>Los valores que ingresas en la calculadora (área, presupuesto, ingresos, etc.) se procesan <strong>únicamente en tu dispositivo</strong>. No se envían a ningún servidor.</p>
+    <p>Las tasas de interés se obtienen desde fuentes públicas oficiales (BCCR, NY Fed) sin transmitir datos del usuario.</p>
+    <p>La preferencia de idioma se guarda en el <code>localStorage</code> de tu navegador para mantener tu selección entre páginas. No se transmite a ningún servidor.</p>
     <h2>6. Derechos del usuario (GDPR / LGPD)</h2>
-    <p>Si eres residente de la Unión Europea o Brasil, tienes derechos sobre tus datos bajo GDPR/LGPD. Como no almacenamos datos personales, no existen datos a acceder, corregir o eliminar en nuestros sistemas.</p>
-    <p>Para datos gestionados por Google AdSense, contacta directamente a Google.</p>
-
+    <p>Si eres residente de la UE o Brasil, tienes derechos bajo GDPR/LGPD. Como no almacenamos datos personales propios, no hay datos que acceder, corregir ni eliminar en nuestros sistemas.</p>
+    <p>Para datos gestionados por Google AdSense, contacta a Google a través de su <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">centro de privacidad</a>.</p>
     <h2>7. Privacidad de menores</h2>
     <p>Este sitio no está dirigido a menores de 13 años y no recopila conscientemente información de menores.</p>
-
     <h2>8. Cambios a esta política</h2>
-    <p>Podemos actualizar esta política periódicamente. La fecha de "última actualización" al inicio del documento refleja la versión vigente.</p>
-
+    <p>Podemos actualizar esta política periódicamente. La fecha al inicio refleja la versión vigente. Cambios significativos serán indicados en el repositorio de GitHub.</p>
     <h2>9. Contacto</h2>
-    <p>Si tienes preguntas sobre esta política de privacidad, puedes contactarnos a través del repositorio público en GitHub.</p>
+    <p>Para preguntas sobre esta política, puedes contactarnos a través del repositorio público en GitHub.</p>
   </div>
 
-  <footer>
-    <p>© 2026 Calculadora de Construcción Costa Rica · <a href="index.html">Inicio</a></p>
-  </footer>
+  <!-- ═══════════ ENGLISH ═══════════ -->
+  <div class="lang-en">
+    <h1>Privacy Policy</h1>
+    <p class="subtitle">Last updated: April 2026</p>
+    <div class="highlight-box">
+      <p><strong>Quick summary:</strong> This tool does not collect or store personal data on its own servers. All calculations are performed in your browser.</p>
+    </div>
+    <h2>1. Who we are</h2>
+    <p>Calculadora de Construcción Costa Rica is a free web tool for estimating construction costs in Costa Rica. It operates as a static site on GitHub Pages with no proprietary database.</p>
+    <h2>2. Data we collect</h2>
+    <p>This tool <strong>does not directly collect personal data</strong>. There are no registration forms, user accounts or proprietary databases. The only data that may be collected is:</p>
+    <ul>
+      <li>Anonymous usage data via <strong>Google Analytics</strong> (if applicable), subject to Google's policy.</li>
+      <li>Browsing data via <strong>Google AdSense</strong> to display relevant ads.</li>
+      <li>Standard technical access data (IP, browser, country) logged by GitHub Pages.</li>
+    </ul>
+    <h2>3. Google AdSense and cookies</h2>
+    <p>This site uses Google AdSense. Google may use cookies to personalize ads based on your browsing history. You can control this at:</p>
+    <ul>
+      <li><a href="https://adssettings.google.com" target="_blank" rel="noopener">Google Ad Settings</a></li>
+      <li><a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener">About Ads – opt out of personalization</a></li>
+    </ul>
+    <p>Google uses DART cookies based on prior visits to this and other websites. You can disable them via <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's privacy policy</a>.</p>
+    <h2>4. Third-party cookies</h2>
+    <p>Our only external advertising provider is Google AdSense. We do not use any other third-party ad networks.</p>
+    <ul>
+      <li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google LLC – Privacy Policy</a></li>
+    </ul>
+    <h2 id="cookies">5. Financial data entered</h2>
+    <p>Values you enter into the calculator (area, budget, income, etc.) are processed <strong>only on your device</strong>. They are not sent to any server.</p>
+    <p>Interest rates are retrieved from official public sources (BCCR, NY Fed) without transmitting user data.</p>
+    <p>Your language preference is saved in your browser's <code>localStorage</code> to maintain your selection across pages. It is not transmitted to any server.</p>
+    <h2>6. User rights (GDPR / LGPD)</h2>
+    <p>If you are a resident of the EU or Brazil, you have rights under GDPR/LGPD. Since we do not store personal data ourselves, there is no data to access, correct or delete in our systems.</p>
+    <p>For data managed by Google AdSense, contact Google directly through their <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">privacy center</a>.</p>
+    <h2>7. Children's privacy</h2>
+    <p>This site is not directed at children under 13 and does not knowingly collect information from minors.</p>
+    <h2>8. Changes to this policy</h2>
+    <p>We may update this policy periodically. The date at the top reflects the current version. Significant changes will be noted in the GitHub repository.</p>
+    <h2>9. Contact</h2>
+    <p>For questions about this privacy policy, contact us through the public repository on GitHub.</p>
+  </div>
+
+</div>
+
+<footer>
+  <p>
+    <span class="lang-es">© 2026 Calculadora de Construcción Costa Rica · <a href="index.html">Inicio</a> · <a href="privacy.html">Privacidad</a></span>
+    <span class="lang-en">© 2026 Calculadora de Construcción Costa Rica · <a href="index.html">Home</a> · <a href="privacy.html">Privacy</a></span>
+  </p>
+</footer>
+
+<script>
+  var currentLang = 'es';
+
+  function applyLang(lang) {
+    currentLang = (lang === 'en') ? 'en' : 'es';
+    var isEn = currentLang === 'en';
+    document.body.classList.toggle('is-en', isEn);
+    document.documentElement.lang = isEn ? 'en' : 'es';
+    document.getElementById('lang-btn').textContent = isEn ? '🌐 Español' : '🌐 English';
+    try { localStorage.setItem('calc-cr-lang', currentLang); } catch(e) {}
+  }
+
+  function togglePrivacyLang() {
+    applyLang(currentLang === 'es' ? 'en' : 'es');
+  }
+
+  // On load: sync language from main page via localStorage, or URL param
+  (function() {
+    var saved = 'es';
+    try { saved = localStorage.getItem('calc-cr-lang') || 'es'; } catch(e) {}
+    var urlLang = new URLSearchParams(window.location.search).get('lang');
+    if (urlLang === 'en' || urlLang === 'es') saved = urlLang;
+    applyLang(saved);
+  })();
+</script>
+
 </body>
 </html>
