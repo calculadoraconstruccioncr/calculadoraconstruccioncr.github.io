@@ -2,7 +2,7 @@ name: Actualizar tasas de referencia
 
 on:
   schedule:
-    - cron: '0 13 * * 1-5'  # 7 AM Costa Rica
+    - cron: '0 13 * * 1-5'
   workflow_dispatch:
 
 permissions:
@@ -52,42 +52,29 @@ jobs:
 
           print("BCCR_EMAIL:", BCCR_EMAIL if BCCR_EMAIL else "NONE")
 
-          # Validación básica
-          if not BCCR_TOKEN or len(BCCR_TOKEN) < 10:
-              print("❌ TOKEN inválido o vacío", file=sys.stderr)
-              sys.exit(1)
-
-          if not BCCR_EMAIL or "@" not in BCCR_EMAIL:
-              print("❌ EMAIL inválido", file=sys.stderr)
-              sys.exit(1)
-
           HEADERS = {
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36'
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
           }
 
           BCCR_URL = 'https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/wsindicadoreseconomicos.asmx/ObtenerIndicadoresEconomicosXML'
 
-          def retry(fn, attempts=3):
-              for i in range(attempts):
-                  try:
-                      return fn()
-                  except Exception as e:
-                      if i == attempts - 1:
-                          raise
-                      time.sleep(2)
-
           def bccr_fetch(indicator_code):
-              def _call():
+              try:
                   params = {
                       'Indicador': indicator_code,
                       'FechaInicio': TODAY,
                       'FechaFinal': TODAY,
                       'Nombre': BCCR_EMAIL,
-                      'SubNiveles': 'N',
+                      'SubNiveles': 'S',
                       'CorreoElectronico': BCCR_EMAIL,
                       'Token': BCCR_TOKEN,
                   }
+
                   r = requests.get(BCCR_URL, params=params, headers=HEADERS, timeout=20)
+
+                  print(f"\n🔎 URL BCCR ({indicator_code}):", r.url)
+                  print("🔎 RESPUESTA (preview):", r.text[:300])
+
                   r.raise_for_status()
 
                   root = ET.fromstring(r.text)
@@ -104,12 +91,11 @@ jobs:
                               pass
 
                   if not values:
-                      raise ValueError(f'Sin datos para indicador {indicator_code}')
+                      print(f"⚠ Sin datos para indicador {indicator_code}", file=sys.stderr)
+                      return None
 
                   return round(values[-1], 4)
 
-              try:
-                  return retry(_call)
               except Exception as e:
                   print(f'❌ BCCR {indicator_code} error: {e}', file=sys.stderr)
                   return None
@@ -165,21 +151,19 @@ jobs:
               print(f'⚠ {key}: usando fallback {old}', file=sys.stderr)
               return old
 
-          print('→ BCCR...')
+          print('\n→ BCCR...')
           tbp = bccr_fetch(423)
           ted = bccr_fetch(23698)
           tc  = bccr_fetch(318)
 
-          if tbp is None and ted is None and tc is None:
-              print("❌ BCCR completamente falló", file=sys.stderr)
-              sys.exit(1)
+          print(f"RESULTADOS BCCR → TBP={tbp}, TED={ted}, TC={tc}")
 
-          print('→ FRED...')
+          print('\n→ FRED...')
           prime = fred_fetch('DPRIME')
           sofr3 = fred_fetch('SOFR90DAYAVG')
           sofr6 = fred_fetch('SOFR180DAYAVG')
 
-          print('→ Cámara...')
+          print('\n→ Cámara...')
           crc = camara_fetch('https://camaradebancos.fi.cr/colones/')
           usd = camara_fetch('https://camaradebancos.fi.cr/dolares/')
 
@@ -202,7 +186,7 @@ jobs:
           with open('rates.json', 'w') as f:
               json.dump(rates, f, indent=2)
 
-          print("✅ rates.json actualizado")
+          print("\n✅ rates.json generado")
           PYEOF
 
       - name: Commit y push
@@ -211,7 +195,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           git add rates.json
-          git diff --staged --quiet || git commit -m "update rates $(date -u '+%Y-%m-%d %H:%M')"
+          git diff --staged --quiet || git commit -m "debug rates $(date -u '+%Y-%m-%d %H:%M')"
 
           git pull --rebase
           git push
