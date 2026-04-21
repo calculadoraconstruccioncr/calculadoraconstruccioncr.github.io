@@ -15,10 +15,14 @@
 
 <meta name="robots" content="index, follow">
 
-<meta property="og:title" content="Calculadora de Construcción Costa Rica">
-<meta property="og:description" content="Calcula fácilmente el costo de construcción en Costa Rica con presupuesto real por metro cuadrado.">
+<meta property="og:title" content="Calculadora de Construcción Costa Rica 2026 | Costo por m², Financiamiento y Comparador de Bancos">
+<meta property="og:description" content="Estime en minutos el costo de construir su casa en Costa Rica. Incluye desglose de presupuesto, simulador hipotecario, comparador de 7 bancos y tabla de amortización. Datos actualizados 2026.">
 <meta property="og:url" content="https://calculadoraconstruccioncr.github.io/">
 <meta property="og:type" content="website">
+<meta property="og:locale" content="es_CR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Calculadora de Construcción Costa Rica 2026">
+<meta name="twitter:description" content="Estime el costo de construir su casa en Costa Rica con presupuesto detallado, financiamiento y comparador de bancos.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
@@ -1367,44 +1371,12 @@
 .expo-ref-hint{font-size:0.68rem;color:var(--gray-400);margin-bottom:8px;}
 
 
-  /* ── Overlay bloqueo tasas ── */
-  #rates-overlay {
-    position: fixed; inset: 0; z-index: 99999;
-    background: rgba(15,23,42,0.6);
-    backdrop-filter: blur(4px);
-    display: flex; align-items: center; justify-content: center;
-    transition: opacity 0.4s ease, visibility 0.4s ease;
-  }
-  #rates-overlay.oculto {
-    opacity: 0; visibility: hidden; pointer-events: none;
-  }
-  .rov-box {
-    background: #fff; border-radius: 18px;
-    padding: 38px 48px; text-align: center;
-    box-shadow: 0 24px 64px rgba(0,0,0,0.3);
-    display: flex; flex-direction: column; align-items: center; gap: 14px;
-    max-width: 320px; width: 90%;
-  }
-  .rov-spin {
-    width: 46px; height: 46px;
-    border: 4px solid #e5e7eb; border-top-color: #16a34a;
-    border-radius: 50%;
-    animation: rov-spin 0.75s linear infinite;
-  }
-  @keyframes rov-spin { to { transform: rotate(360deg); } }
-  .rov-title { margin:0; font-size:1rem; font-weight:700; color:#111827; }
-  .rov-sub   { margin:0; font-size:0.78rem; color:#6b7280; line-height:1.55; }
+  /* details/summary FAQ accordion */
+  details summary::-webkit-details-marker { display: none; }
+  details[open] summary span:last-child { transform: rotate(45deg); display: inline-block; }
 </style>
-<script src="https://pl28978602.profitablecpmratenetwork.com/74/17/fc/7417fc4524af204abd4c790d051c4f4d.js"></script>
 </head>
 <body>
-<div id="rates-overlay">
-  <div class="rov-box">
-    <div class="rov-spin"></div>
-    <h3 class="rov-title" id="rov-title">Actualizando tasas…</h3>
-    <p class="rov-sub" id="rov-sub">Consultando BCCR · NY Fed · FRED<br>La página estará lista en segundos.</p>
-  </div>
-</div>
 
 <!-- NAV -->
 <nav>
@@ -1586,63 +1558,166 @@
   </div>
 </section>
 
-<!-- SEO & ADSENSE CONTENT -->
-<!-- SEO & ADSENSE CONTENT -->
-<section id="seo-content" style="max-width: 900px; margin: 50px auto; padding: 30px; background: #ffffff; border-radius: 16px; line-height: 1.8; color: #333; box-shadow: 0 4px 20px rgba(0,0,0,0.05); text-align: center;">
+<!-- GUÍA DE CONTENIDO: Contenido sustantivo E-E-A-T para cumplir políticas de Google -->
+<section id="seo-content" style="max-width: 900px; margin: 48px auto 0; padding: 0 20px;">
 
-  <h2 style="font-family: 'Instrument Serif', serif; font-size: 2rem; color: #1f4d3a; margin-bottom: 20px;">
-    ¿Cuánto cuesta construir en Costa Rica en 2026?
-  </h2>
+  <!-- Bloque 1: Costos -->
+  <article style="background:#fff;border-radius:16px;padding:36px;box-shadow:0 4px 20px rgba(0,0,0,0.06);border:1px solid #e5e7eb;margin-bottom:28px;">
+    <h2 style="font-family:'Instrument Serif',serif;font-size:1.9rem;color:#145a32;margin-bottom:6px;">¿Cuánto cuesta construir una casa en Costa Rica en 2026?</h2>
+    <p style="font-size:0.8rem;color:#6b7280;margin-bottom:20px;">Actualizado: abril 2026 · Fuentes: CICSA, CFIA, INEC, BCCR</p>
+    <p style="font-size:1rem;line-height:1.8;color:#374151;margin-bottom:16px;">El costo de construcción en Costa Rica varía significativamente según zona, sistema constructivo y nivel de acabados. Con base en datos del CICSA y el CFIA, los rangos de referencia para 2026 son:</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:20px 0 24px;">
+      <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:18px;">
+        <div style="font-size:0.72rem;font-weight:800;color:#166534;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Acabado Básico</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#145a32;">₡285,000–₡310,000</div>
+        <div style="font-size:0.78rem;color:#4b7c5e;margin-top:4px;">por metro cuadrado</div>
+        <p style="font-size:0.78rem;color:#374151;margin-top:10px;line-height:1.6;">Cerámica básica, ventanas de aluminio estándar, techo de zinc, sin cielos rasos, pintura simple. Ideal para primera vivienda o proyectos de inversión.</p>
+      </div>
+      <div style="background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:12px;padding:18px;">
+        <div style="font-size:0.72rem;font-weight:800;color:#1d4ed8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Acabado Intermedio</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#1e40af;">₡355,000–₡390,000</div>
+        <div style="font-size:0.78rem;color:#3b5ea6;margin-top:4px;">por metro cuadrado</div>
+        <p style="font-size:0.78rem;color:#374151;margin-top:10px;line-height:1.6;">Porcelanato importado, ventanas de aluminio con vidrio doble, cielos lisos, cocina funcional con isla. El más solicitado en el mercado residencial CR 2025–2026.</p>
+      </div>
+      <div style="background:#fdf4ff;border:1.5px solid #e9d5ff;border-radius:12px;padding:18px;">
+        <div style="font-size:0.72rem;font-weight:800;color:#7e22ce;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Acabado Alto</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#6b21a8;">₡430,000–₡600,000+</div>
+        <div style="font-size:0.78rem;color:#7c3aed;margin-top:4px;">por metro cuadrado</div>
+        <p style="font-size:0.78rem;color:#374151;margin-top:10px;line-height:1.6;">Mármol o cuarzo, ventanas de vidrio templado, domótica, cocina equipada. Proyectos en Escazú, Santa Ana, Sabana Norte o Guanacaste premium.</p>
+      </div>
+    </div>
+    <p style="font-size:0.95rem;line-height:1.8;color:#374151;margin-bottom:14px;"><strong>Importante:</strong> estos valores son solo el costo de construcción de la obra. Al presupuesto total debe agregar honorarios profesionales (~12% del costo según CFIA), permisos (~2% entre CFIA y Municipalidad), póliza INS (~3.75%), contingencia recomendada 8–15%, y el terreno si aplica.</p>
+    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px 18px;">
+      <strong style="color:#92400e;">📌 Nota inflación 2026:</strong>
+      <span style="font-size:0.88rem;color:#78350f;"> Los materiales acumulan una inflación del 6.2% interanual a marzo 2026 (INEC). Acero, cemento y bloque registraron los mayores incrementos. Cotice con proveedores antes de cerrar el presupuesto.</span>
+    </div>
+  </article>
 
-  <p style="margin-bottom: 18px; font-size: 1.05rem;">
-    La construcción de una casa en Costa Rica depende de múltiples factores como el tipo de acabados, el terreno, la ubicación y el sistema constructivo utilizado. El costo por metro cuadrado puede variar considerablemente según el nivel de detalle del proyecto.
-  </p>
+  <!-- Bloque 2: Factores -->
+  <article style="background:#fff;border-radius:16px;padding:36px;box-shadow:0 4px 20px rgba(0,0,0,0.06);border:1px solid #e5e7eb;margin-bottom:28px;">
+    <h2 style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#145a32;margin-bottom:18px;">Factores que determinan el precio de construir en Costa Rica</h2>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="border-left:4px solid #27ae60;padding-left:18px;">
+        <h3 style="font-size:1rem;font-weight:700;color:#1a2e1a;margin-bottom:6px;">1. Ubicación: el factor más determinante</h3>
+        <p style="font-size:0.9rem;line-height:1.75;color:#374151;">La zona puede encarecer la obra entre un 5% y un 18% sobre el costo base del GAM. Zonas como Tamarindo o Nosara aplican factores hasta ×1.18 por logística y menor disponibilidad de mano de obra calificada. Construir en Heredia, Cartago o San José central es considerablemente más económico.</p>
+      </div>
+      <div style="border-left:4px solid #3b82f6;padding-left:18px;">
+        <h3 style="font-size:1rem;font-weight:700;color:#1a2e1a;margin-bottom:6px;">2. Sistema constructivo: block, liviano o prefabricado</h3>
+        <p style="font-size:0.9rem;line-height:1.75;color:#374151;"><strong>Bloque de concreto:</strong> el más usado en CR, robusto ante sismos, costo base. <strong>Sistema liviano</strong> (steel frame o madera): reduce el costo 5–10% y el tiempo 30–40%. <strong>Prefabricado:</strong> reduce costos hasta 10%, más rápido pero con menor flexibilidad de diseño. El CFIA regula los requisitos técnicos bajo el Código Sísmico de CR (CSCR 2010).</p>
+      </div>
+      <div style="border-left:4px solid #f59e0b;padding-left:18px;">
+        <h3 style="font-size:1rem;font-weight:700;color:#1a2e1a;margin-bottom:6px;">3. Topografía: el costo que muchos olvidan presupuestar</h3>
+        <p style="font-size:0.9rem;line-height:1.75;color:#374151;">Pendiente moderada (15–30%) puede incrementar el costo total 8–12% por movimiento de tierras, compactación y muros de retención menores. Pendiente fuerte (&gt;30%) puede superar el 20% de sobrecosto y requerir estudio geotécnico. Evalúe el terreno con un ingeniero antes de comprarlo.</p>
+      </div>
+      <div style="border-left:4px solid #8b5cf6;padding-left:18px;">
+        <h3 style="font-size:1rem;font-weight:700;color:#1a2e1a;margin-bottom:6px;">4. Honorarios profesionales: obligatorios según CFIA</h3>
+        <p style="font-size:0.9rem;line-height:1.75;color:#374151;">La Ley Orgánica del CFIA exige profesionales responsables para cualquier construcción con permisos. Los honorarios mínimos (≈12%) cubren: diseño arquitectónico, ingeniería estructural, dirección técnica e inspección. Sin profesional inscrito en CFIA no puede obtener permisos, conectar servicios (AyA, ICE) ni inscribir la propiedad en el Registro Nacional.</p>
+      </div>
+      <div style="border-left:4px solid #ef4444;padding-left:18px;">
+        <h3 style="font-size:1rem;font-weight:700;color:#1a2e1a;margin-bottom:6px;">5. Permisos, seguros y contingencia</h3>
+        <p style="font-size:0.9rem;line-height:1.75;color:#374151;"><strong>Permisos</strong> (CFIA + Municipalidad): ~2% del valor de obra, requisito legal previo. <strong>Póliza INS</strong> de Riesgos del Trabajo: 3.75%, obligatoria antes del primer día de obra. <strong>Contingencia</strong> recomendada: 8–15% para cubrir variaciones de materiales, cambios de diseño o imprevistos del terreno, muy comunes en proyectos CR.</p>
+      </div>
+    </div>
+  </article>
 
-  <p style="margin-bottom: 18px; font-size: 1.05rem;">
-    En términos generales, una vivienda con acabados estándar puede tener un costo estimado entre ₡285,000 y ₡430,000 por metro cuadrado, aunque proyectos premium pueden superar estos valores.
-  </p>
+  <!-- Bloque 3: Pasos -->
+  <article style="background:#fff;border-radius:16px;padding:36px;box-shadow:0 4px 20px rgba(0,0,0,0.06);border:1px solid #e5e7eb;margin-bottom:28px;">
+    <h2 style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#145a32;margin-bottom:18px;">Pasos para construir una casa en Costa Rica: guía completa 2026</h2>
+    <ol style="padding-left:0;list-style:none;display:flex;flex-direction:column;gap:14px;">
+      <li style="display:flex;gap:14px;align-items:flex-start;">
+        <span style="background:#145a32;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:800;flex-shrink:0;margin-top:2px;">1</span>
+        <div><strong style="color:#1a2e1a;">Evaluación del lote</strong><p style="font-size:0.88rem;line-height:1.7;color:#374151;margin-top:4px;">Verifique en el Registro Nacional gravámenes e hipotecas. Confirme el uso de suelo con la municipalidad. Evalúe disponibilidad de agua (AyA o pozo), electricidad y acceso vial. Contrate topógrafo inscrito en CFIA para verificar el plano catastrado y linderos reales.</p></div>
+      </li>
+      <li style="display:flex;gap:14px;align-items:flex-start;">
+        <span style="background:#145a32;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:800;flex-shrink:0;margin-top:2px;">2</span>
+        <div><strong style="color:#1a2e1a;">Diseño arquitectónico y planos constructivos</strong><p style="font-size:0.88rem;line-height:1.7;color:#374151;margin-top:4px;">El arquitecto diseña según sus necesidades y el reglamento municipal. Los planos incluyen: arquitectura, estructura (vigas, columnas, losa), instalaciones eléctricas e hidráulicas. Todos deben ser firmados y sellados por profesionales CFIA.</p></div>
+      </li>
+      <li style="display:flex;gap:14px;align-items:flex-start;">
+        <span style="background:#145a32;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:800;flex-shrink:0;margin-top:2px;">3</span>
+        <div><strong style="color:#1a2e1a;">Trámite de permisos CFIA y Municipalidad</strong><p style="font-size:0.88rem;line-height:1.7;color:#374151;margin-top:4px;">Se gestiona en el APC (Administrador de Proyectos de Construcción) del CFIA en línea. San José y Heredia aprueban en 4–8 semanas; municipalidades pequeñas pueden tomar 2–4 meses. Sin permisos la obra es ilegal y puede ser clausurada.</p></div>
+      </li>
+      <li style="display:flex;gap:14px;align-items:flex-start;">
+        <span style="background:#145a32;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:800;flex-shrink:0;margin-top:2px;">4</span>
+        <div><strong style="color:#1a2e1a;">Contratación del constructor e inicio de obra</strong><p style="font-size:0.88rem;line-height:1.7;color:#374151;margin-top:4px;">Solicite mínimo 3 cotizaciones detalladas. Exija contrato escrito con: materiales especificados, forma de pago por avance, plazo y garantías. La póliza INS debe estar vigente antes del primer día de obra. Coordine cronograma de desembolsos con el banco si hay financiamiento.</p></div>
+      </li>
+      <li style="display:flex;gap:14px;align-items:flex-start;">
+        <span style="background:#145a32;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:800;flex-shrink:0;margin-top:2px;">5</span>
+        <div><strong style="color:#1a2e1a;">Ejecución y supervisión técnica</strong><p style="font-size:0.88rem;line-height:1.7;color:#374151;margin-top:4px;">Las 7 etapas típicas en CR: preliminares, cimentación, paredes y techos, instalaciones, cielos y repellos, acabados y limpieza. Una casa de 100 m² tarda 6–8 meses en bloque o 4–5 meses en sistema liviano.</p></div>
+      </li>
+      <li style="display:flex;gap:14px;align-items:flex-start;">
+        <span style="background:#145a32;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:800;flex-shrink:0;margin-top:2px;">6</span>
+        <div><strong style="color:#1a2e1a;">Recepción, inscripción y conexión de servicios</strong><p style="font-size:0.88rem;line-height:1.7;color:#374151;margin-top:4px;">Al terminar, el profesional emite la declaración de obra terminada. Con este documento solicita conexión definitiva de agua y luz, e inscribe la construcción en el Registro Nacional para actualizar el valor catastral e habilitar traspaso futuro.</p></div>
+      </li>
+    </ol>
+  </article>
 
-  <p style="margin-bottom: 24px; font-size: 1.05rem;">
-    Esta calculadora te ayuda a obtener una estimación rápida del presupuesto total considerando área, niveles, acabados y otros elementos relevantes.
-  </p>
+  <!-- Bloque 4: Financiamiento -->
+  <article style="background:#fff;border-radius:16px;padding:36px;box-shadow:0 4px 20px rgba(0,0,0,0.06);border:1px solid #e5e7eb;margin-bottom:28px;">
+    <h2 style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#145a32;margin-bottom:18px;">Financiamiento hipotecario para construcción en Costa Rica 2026</h2>
+    <p style="font-size:0.95rem;line-height:1.8;color:#374151;margin-bottom:18px;">Los bancos en Costa Rica ofrecen créditos hipotecarios específicos para construcción. Las condiciones generales del mercado en 2026 son:</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-bottom:22px;">
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:16px;">
+        <div style="font-weight:700;color:#1a2e1a;margin-bottom:8px;">BCR (Banco de Costa Rica)</div>
+        <ul style="font-size:0.83rem;color:#374151;line-height:1.8;padding-left:16px;"><li>Financia hasta el 90% del valor</li><li>Tasa fija: 8.25% CRC / 5.50% USD (2 años)</li><li>Tasa variable: TBP + 3.50%</li><li>Plazo máximo: 30 años</li></ul>
+      </div>
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:16px;">
+        <div style="font-weight:700;color:#1a2e1a;margin-bottom:8px;">Banco Nacional (BN)</div>
+        <ul style="font-size:0.83rem;color:#374151;line-height:1.8;padding-left:16px;"><li>Financia hasta el 80% del valor</li><li>Tasa fija: 8.50% CRC (2 años)</li><li>Tasa variable: TBP + 5.35%</li><li>Programa Vivienda Popular disponible</li></ul>
+      </div>
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:16px;">
+        <div style="font-weight:700;color:#1a2e1a;margin-bottom:8px;">BAC Credomatic</div>
+        <ul style="font-size:0.83rem;color:#374151;line-height:1.8;padding-left:16px;"><li>Financia hasta el 85% del valor</li><li>Tasa fija: 8.00% CRC (2 años)</li><li>Tasa variable: TBP + 4.35%</li><li>Proceso 100% digital disponible</li></ul>
+      </div>
+    </div>
+    <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:18px;">
+      <p style="font-size:0.88rem;line-height:1.75;color:#145a32;margin:0;"><strong>Tip importante:</strong> Para un crédito de construcción, el banco desembolsa en tractos según avance de obra (normalmente 3–4 desembolsos). El ingeniero inspector del banco certifica cada etapa antes del siguiente desembolso. Planifique su flujo de caja de construcción en función de este esquema.</p>
+    </div>
+  </article>
 
-  <h3 style="font-size: 1.2rem; margin: 24px 0 16px; color: #222;">
-    Factores clave que influyen en el precio
-  </h3>
+  <!-- Bloque FAQ -->
+  <article id="faq" style="background:#fff;border-radius:16px;padding:36px;box-shadow:0 4px 20px rgba(0,0,0,0.06);border:1px solid #e5e7eb;margin-bottom:28px;">
+    <h2 style="font-family:'Instrument Serif',serif;font-size:1.6rem;color:#145a32;margin-bottom:24px;">Preguntas frecuentes sobre construcción en Costa Rica</h2>
+    <div style="display:flex;flex-direction:column;gap:0;">
+      <details style="border-bottom:1px solid #e5e7eb;padding:16px 0;" open>
+        <summary style="font-size:0.98rem;font-weight:700;color:#1a2e1a;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">¿Cuánto cuesta construir una casa de 100 m² en Costa Rica?<span style="color:#27ae60;font-size:1.2rem;flex-shrink:0;margin-left:12px;">+</span></summary>
+        <p style="font-size:0.9rem;line-height:1.75;color:#374151;margin-top:12px;">Para 100 m² con acabado intermedio en el GAM, el costo de construcción ronda ₡35–₡39 millones (₡355,000–₡390,000/m²). Sumando honorarios (≈₡4.5M), permisos (≈₡700K), INS (≈₡1.3M) y contingencia 10% (≈₡3.9M), el total se sitúa entre ₡45–₡50 millones. Use la calculadora arriba para una estimación personalizada.</p>
+      </details>
+      <details style="border-bottom:1px solid #e5e7eb;padding:16px 0;">
+        <summary style="font-size:0.98rem;font-weight:700;color:#1a2e1a;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">¿Cuánto tiempo se tarda en construir una casa en Costa Rica?<span style="color:#27ae60;font-size:1.2rem;flex-shrink:0;margin-left:12px;">+</span></summary>
+        <p style="font-size:0.9rem;line-height:1.75;color:#374151;margin-top:12px;">Una vivienda de 80–120 m² en bloque tarda 6–10 meses; en sistema liviano, 4–6 meses. Los permisos toman 1–3 meses previos. En total, desde el diseño hasta mudarse, planifique 12–18 meses para la mayoría de proyectos.</p>
+      </details>
+      <details style="border-bottom:1px solid #e5e7eb;padding:16px 0;">
+        <summary style="font-size:0.98rem;font-weight:700;color:#1a2e1a;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">¿Es mejor construir en colones o en dólares?<span style="color:#27ae60;font-size:1.2rem;flex-shrink:0;margin-left:12px;">+</span></summary>
+        <p style="font-size:0.9rem;line-height:1.75;color:#374151;margin-top:12px;">Si sus ingresos son en colones, generalmente es más seguro el crédito en CRC para evitar riesgo cambiario. Aunque la tasa en USD parece más baja (5–6% vs 8–9% CRC), una devaluación encarecería sus cuotas. El SUGEF recomienda endeudarse en la moneda de sus ingresos.</p>
+      </details>
+      <details style="border-bottom:1px solid #e5e7eb;padding:16px 0;">
+        <summary style="font-size:0.98rem;font-weight:700;color:#1a2e1a;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">¿Se puede construir sin arquitecto o ingeniero en Costa Rica?<span style="color:#27ae60;font-size:1.2rem;flex-shrink:0;margin-left:12px;">+</span></summary>
+        <p style="font-size:0.9rem;line-height:1.75;color:#374151;margin-top:12px;">No legalmente. La Ley Orgánica del CFIA (Ley 3663) y la Ley de Construcciones (Ley 833) exigen profesional responsable inscrito en CFIA para toda construcción que requiera permisos. Construir sin permisos puede resultar en multas, orden de demolición e imposibilidad de inscribir la propiedad en el Registro Nacional.</p>
+      </details>
+      <details style="border-bottom:1px solid #e5e7eb;padding:16px 0;">
+        <summary style="font-size:0.98rem;font-weight:700;color:#1a2e1a;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">¿Cuál es la prima mínima para un crédito hipotecario en Costa Rica?<span style="color:#27ae60;font-size:1.2rem;flex-shrink:0;margin-left:12px;">+</span></summary>
+        <p style="font-size:0.9rem;line-height:1.75;color:#374151;margin-top:12px;">BCR y Grupo Mutual financian hasta 90% (prima mínima 10%). BAC hasta 85% (prima mínima 15%). Banco Nacional, Davivienda y otros hasta 80% (prima mínima 20%). Además debe contar con ~3% del monto del préstamo para gastos de formalización: escritura, comisión bancaria, avalúo e inscripción en el Registro Nacional.</p>
+      </details>
+      <details style="padding:16px 0;">
+        <summary style="font-size:0.98rem;font-weight:700;color:#1a2e1a;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">¿Cómo calcular el ingreso mínimo para un crédito de construcción?<span style="color:#27ae60;font-size:1.2rem;flex-shrink:0;margin-left:12px;">+</span></summary>
+        <p style="font-size:0.9rem;line-height:1.75;color:#374151;margin-top:12px;">La cuota mensual total (incluyendo pólizas) no puede superar el 40–65% del ingreso neto comprobable. Aprobación cómoda al 40%, riesgo moderado hasta 55%, límite en 65%. Ejemplo: si la cuota total es ₡600,000/mes, necesita ingreso neto de al menos ₡923,000 (umbral holgado) o ₡1,091,000 (umbral probable). La calculadora en esta página tiene un módulo de "Ingreso Mínimo Requerido" que calcula este valor para su proyecto.</p>
+      </details>
+    </div>
+  </article>
 
-  <ul style="list-style-position: inside; padding: 0; margin: 0 auto 24px; max-width: 750px; text-align: left;">
-    <li style="margin-bottom: 10px;"><strong>Acabados y materiales:</strong> Pisos de cerámica vs porcelanato, tipo de grifería y estructura de techo impactan directamente el costo.</li>
-
-    <li style="margin-bottom: 10px;"><strong>Topografía del suelo:</strong> Un lote inclinado requiere más movimiento de tierra y muros de retención.</li>
-
-    <li style="margin-bottom: 10px;"><strong>Honorarios profesionales:</strong> El CFIA define tarifas mínimas para diseño, planos y dirección técnica.</li>
-  </ul>
-
-  <p style="font-size: 1.05rem;">
-    Utiliza nuestra calculadora para obtener un desglose detallado de gastos de construcción y financiamiento actualizado en Costa Rica.
-  </p>
+  <!-- Bloque Acerca de -->
+  <article style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;border-radius:16px;padding:28px 32px;margin-bottom:32px;">
+    <h2 style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:#145a32;margin-bottom:10px;">Acerca de esta calculadora</h2>
+    <p style="font-size:0.88rem;line-height:1.75;color:#374151;">Esta herramienta de estimación de costos de construcción es desarrollada y actualizada con base en datos del <strong>CICSA</strong> (Cámara Costarricense de la Construcción), el <strong>CFIA</strong> (Colegio Federado de Ingenieros y Arquitectos), el <strong>INEC</strong> y el <strong>BCCR</strong>. Las estimaciones son referenciales y no sustituyen la cotización formal de un profesional de la construcción.</p>
+    <p style="font-size:0.8rem;color:#4b7c5e;margin-top:10px;">Última actualización de costos: abril 2026 · Tasas de referencia: actualizadas en tiempo real desde BCCR y NY Fed.</p>
+  </article>
 
 </section>
-     
-  <!-- CTA card al pie del SEO — segundo punto de entrada a la calculadora -->
-  <div style="background:linear-gradient(135deg,#f0fdf4 0%,#dcfce7 100%);border:1.5px solid #86efac;border-radius:16px;padding:28px 24px;text-align:center;margin-bottom:8px;">
-    <p style="font-size:1.05rem;font-weight:600;color:#145a32;margin-bottom:6px;" data-i18n="seo_cta_title">¿Listo para estimar el costo de su proyecto?</p>
-    <p style="font-size:0.88rem;color:#3d4149;margin-bottom:20px;" data-i18n="seo_cta_sub">Ingrese los datos de su construcción y obtenga en segundos un presupuesto detallado con financiamiento incluido.</p>
-    <button onclick="iniciarCalculadora()" class="hero-btn" style="background:var(--green-700);box-shadow:0 4px 20px rgba(20,90,50,0.3);">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/><line x1="8" y1="15" x2="12" y2="15"/></svg>
-      <span data-i18n="hero_btn">Calcular costo de construcción</span>
-    </button>
-  </div>
-</section>
+<!-- AdSense ad slot (configured separately) -->
 
-<!-- ANUNCIO CPM -->
-<div style="text-align:center; margin: 32px auto; max-width:900px; padding: 0 16px;">
-  <script async="async" data-cfasync="false" src="https://pl28978996.profitablecpmratenetwork.com/38a413f6cd85aa0648a1fc48d43079ff/invoke.js"></script>
-  <div id="container-38a413f6cd85aa0648a1fc48d43079ff"></div>
-</div>
 
 <!-- MAIN -->
-<div class="main-container" id="calculadora" style="display: none;">
+<div class="main-container" id="calculadora">
 
   <!-- Moneda bar moved to nav — fallback for mobile (hidden on desktop via CSS) -->
   <div id="moneda-bar-mobile" style="display:none;align-items:center;flex-wrap:wrap;gap:10px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:8px 14px;margin-bottom:14px;">
@@ -2735,13 +2810,81 @@
 </div>
 
 <script src="app.js"></script>
+<script>
+// iniciarCalculadora: scroll suavemente a la calculadora (siempre visible)
+function iniciarCalculadora() {
+  var el = document.getElementById('calculadora');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+// Ensure overlay is never shown (removed from HTML but JS may reference it)
+window.addEventListener('DOMContentLoaded', function() {
+  var ov = document.getElementById('rates-overlay');
+  if (ov) ov.remove();
+});
+</script>
 <script type="application/ld+json">
 {
  "@context":"https://schema.org",
- "@type":"WebApplication",
- "name":"Calculadora de Construcción Costa Rica",
- "url":"https://calculadoraconstruccioncr.github.io/",
- "description":"Calculadora para estimar costo de construcción en Costa Rica"
+ "@graph":[
+   {
+     "@type":"WebApplication",
+     "name":"Calculadora de Construcción Costa Rica",
+     "url":"https://calculadoraconstruccioncr.github.io/",
+     "description":"Calculadora gratuita para estimar el costo de construcción en Costa Rica. Calcula presupuesto por m², honorarios, permisos, financiamiento hipotecario y comparador de bancos.",
+     "applicationCategory":"FinanceApplication",
+     "operatingSystem":"Any",
+     "inLanguage":"es-CR",
+     "offers":{"@type":"Offer","price":"0","priceCurrency":"CRC"}
+   },
+   {
+     "@type":"FAQPage",
+     "mainEntity":[
+       {
+         "@type":"Question",
+         "name":"¿Cuánto cuesta construir una casa de 100 m² en Costa Rica?",
+         "acceptedAnswer":{"@type":"Answer","text":"Para una casa de 100 m² con acabado intermedio en el GAM, el costo de construcción ronda ₡35–₡39 millones (₡355,000–₡390,000/m²). Sumando honorarios (≈₡4.5M), permisos (≈₡700K), INS (≈₡1.3M) y contingencia 10% (≈₡3.9M), el presupuesto total se sitúa entre ₡45–₡50 millones."}
+       },
+       {
+         "@type":"Question",
+         "name":"¿Cuánto tiempo se tarda en construir una casa en Costa Rica?",
+         "acceptedAnswer":{"@type":"Answer","text":"Una vivienda de 80–120 m² en bloque tarda 6–10 meses. En sistema liviano (steel frame), el mismo proyecto se completa en 4–6 meses. Sumando 1–3 meses de permisos previos, planifique un horizonte total de 12–18 meses desde el diseño hasta mudarse."}
+       },
+       {
+         "@type":"Question",
+         "name":"¿Es mejor construir en colones o en dólares en Costa Rica?",
+         "acceptedAnswer":{"@type":"Answer","text":"Si sus ingresos son en colones, generalmente es más seguro el crédito en CRC para evitar riesgo cambiario. Aunque la tasa en USD puede parecer más baja (5–6% vs 8–9% CRC), una devaluación encarecería sus cuotas. El SUGEF recomienda endeudarse en la moneda en que recibe sus ingresos."}
+       },
+       {
+         "@type":"Question",
+         "name":"¿Se puede construir sin arquitecto o ingeniero en Costa Rica?",
+         "acceptedAnswer":{"@type":"Answer","text":"No legalmente. La Ley Orgánica del CFIA (Ley 3663) y la Ley de Construcciones (Ley 833) exigen profesional responsable inscrito en el CFIA para toda construcción que requiera permisos. Construir sin permisos puede resultar en multas, orden de demolición e imposibilidad de inscribir la propiedad en el Registro Nacional."}
+       },
+       {
+         "@type":"Question",
+         "name":"¿Cuál es la prima mínima para un crédito hipotecario en Costa Rica?",
+         "acceptedAnswer":{"@type":"Answer","text":"BCR y Grupo Mutual financian hasta el 90% (prima mínima 10%). BAC hasta el 85% (prima mínima 15%). Banco Nacional, Davivienda y otros hasta el 80% (prima mínima 20%). Además debe contar con ~3% del préstamo para gastos de formalización: escritura, comisión bancaria, avalúo e inscripción en el Registro Nacional."}
+       },
+       {
+         "@type":"Question",
+         "name":"¿Cómo calcular el ingreso mínimo para un crédito de construcción en Costa Rica?",
+         "acceptedAnswer":{"@type":"Answer","text":"La cuota mensual total (incluyendo pólizas) no puede superar el 40–65% del ingreso neto comprobable. Aprobación cómoda al 40%, riesgo moderado hasta 55%, límite estricto en 65%. Ejemplo: si la cuota total es ₡600,000/mes, necesita un ingreso neto de al menos ₡923,000 para aprobación holgada o ₡1,091,000 para el rango probable."}
+       }
+     ]
+   },
+   {
+     "@type":"HowTo",
+     "name":"Cómo calcular el costo de construir una casa en Costa Rica",
+     "description":"Guía paso a paso para estimar el presupuesto de construcción residencial en Costa Rica usando la calculadora.",
+     "step":[
+       {"@type":"HowToStep","position":1,"name":"Ingresar área de construcción","text":"Ingrese los metros cuadrados totales de la construcción techada en el campo 'Área de construcción'."},
+       {"@type":"HowToStep","position":2,"name":"Seleccionar tipo de acabado","text":"Elija entre Básico (₡285K/m²), Intermedio (₡355K/m²) o Alto (₡430K/m²) según el nivel de materiales y terminaciones del proyecto."},
+       {"@type":"HowToStep","position":3,"name":"Elegir sistema constructivo","text":"Seleccione Block tradicional (factor 1.0×), Sistema liviano (0.95×) o Prefabricado (0.9×) según el método estructural."},
+       {"@type":"HowToStep","position":4,"name":"Configurar ubicación y topografía","text":"Seleccione la provincia y zona específica del proyecto. Indique si el terreno es plano, con pendiente moderada (+10%) o fuerte (+20%)."},
+       {"@type":"HowToStep","position":5,"name":"Revisar el desglose de presupuesto","text":"Obtenga el presupuesto completo con construcción base, honorarios CFIA, permisos, seguro INS y contingencia editable."},
+       {"@type":"HowToStep","position":6,"name":"Simular el financiamiento hipotecario","text":"Ingrese su ingreso mensual neto, la prima inicial y el plazo deseado para calcular cuotas, comparar bancos y obtener la tabla de amortización."}
+     ]
+   }
+ ]
 }
 </script>
 </body>
