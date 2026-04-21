@@ -4,7 +4,7 @@ on:
   schedule:
     # Lunes a viernes 7:00 AM Costa Rica (UTC-6 = 13:00 UTC)
     - cron: '0 13 * * 1-5'
-  workflow_dispatch:   # Ejecución manual desde GitHub Actions
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -24,89 +24,132 @@ jobs:
           python-version: '3.12'
 
       - name: Instalar dependencias
-        run: pip install requests --quiet
+        run: pip install requests beautifulsoup4 lxml --quiet
 
       - name: Obtener tasas y actualizar rates.json
         env:
-          # Token gratuito: https://www.bccr.fi.cr/indicadores-economicos/servicio-web
-          # Si no tiene token, el sistema igual funciona para indicadores públicos
-          BCCR_TOKEN: ${{ secrets.BCCR_TOKEN || 'sin-token' }}
-          BCCR_EMAIL: ${{ secrets.BCCR_EMAIL || 'rates@calculadora-cr.github.io' }}
+          BCCR_TOKEN: ${{ secrets.BCCR_TOKEN || '' }}
+          BCCR_EMAIL: ${{ secrets.BCCR_EMAIL || '' }}
         run: |
           python3 - << 'PYEOF'
           import requests, json, re, sys, os
-          from datetime import datetime, timedelta
+          from datetime import datetime, UTC
           from xml.etree import ElementTree as ET
+          from bs4 import BeautifulSoup
 
-          NOW       = datetime.utcnow()
+          NOW       = datetime.now(UTC)
           TODAY     = NOW.strftime('%d/%m/%Y')
-          MONTH_AGO = (NOW - timedelta(days=30)).strftime('%d/%m/%Y')
+          MONTH_AGO = (NOW.replace(day=1)).strftime('%d/%m/%Y')
 
-          BCCR_TOKEN = os.environ.get('BCCR_TOKEN', 'sin-token')
-          BCCR_EMAIL = os.environ.get('BCCR_EMAIL', 'rates@calculadora-cr.github.io')
+          BCCR_TOKEN = os.environ.get('BCCR_TOKEN', '').strip()
+          BCCR_EMAIL = os.environ.get('BCCR_EMAIL', '').strip()
 
-          HEADERS = {'User-Agent': 'CalculadoraCR-RatesBot/1.0 (github-actions)'}
+          HEADERS = {
+              'User-Agent': 'Mozilla/5.0 (compatible; CalculadoraCR-Bot/2.0)',
+              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          }
 
-          # ─── URL CORRECTA del BCCR (el error anterior usaba una URL vieja) ───
-          # Fuente oficial: https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/wsindicadoreseconomicos.asmx
+          # ─── DIAGNÓSTICO: mostrar parcialmente para ayudar a depurar ───
+          if BCCR_EMAIL:
+              parts = BCCR_EMAIL.split('@')
+              safe = parts[0][:3] + '***@' + parts[1] if len(parts) == 2 else '***'
+              print(f'  BCCR email: {safe}')
+          else:
+              print('  ⚠ BCCR_EMAIL no configurado — usando fallback para BCCR')
+
+          if BCCR_TOKEN:
+              print(f'  BCCR token: {BCCR_TOKEN[:4]}...{BCCR_TOKEN[-3:]} ({len(BCCR_TOKEN)} chars)')
+          else:
+              print('  ⚠ BCCR_TOKEN no configurado — usando fallback para BCCR')
+
+          # ─── BCCR API ────────────────────────────────────────────────
+          # URL oficial (nueva): gee.bccr.fi.cr/Indicadores/Suscripciones/WS
+          # Registro gratuito: https://www.bccr.fi.cr/indicadores-economicos/servicio-web
+          # El error "No se encontró una suscripción" significa que el email del
+          # secret BCCR_EMAIL no coincide EXACTAMENTE con el email registrado en BCCR.
           BCCR_URL = (
               'https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/'
               'wsindicadoreseconomicos.asmx/ObtenerIndicadoresEconomicosXML'
           )
 
-          # Indicadores públicos: no requieren token real (usan cualquier valor)
-          # Con token registrado funcionan mejor y con más cuota
-          # Códigos: TBP=423, TED=23698, TC compra=317, TC venta=318
-
-          def bccr_fetch(indicador_code, label=''):
-              """Obtiene el valor más reciente de un indicador BCCR."""
-              params = {
-                  'Indicador':         str(indicador_code),
-                  'FechaInicio':       MONTH_AGO,
-                  'FechaFinal':        TODAY,
-                  'Nombre':            'CalculadoraCR',
-                  'SubNiveles':        'N',
-                  'CorreoElectronico': BCCR_EMAIL,
-                  'Token':             BCCR_TOKEN,
-              }
+          def bccr_fetch(code, label):
+              if not BCCR_EMAIL or not BCCR_TOKEN:
+                  print(f'  ⏭ BCCR {label}({code}): sin credenciales — saltando')
+                  return None
               try:
+                  params = {
+                      'Indicador':         str(code),
+                      'FechaInicio':       MONTH_AGO,
+                      'FechaFinal':        TODAY,
+                      'Nombre':            'CalculadoraCR',
+                      'SubNiveles':        'N',
+                      'CorreoElectronico': BCCR_EMAIL,
+                      'Token':             BCCR_TOKEN,
+                  }
                   r = requests.get(BCCR_URL, params=params,
                                    headers=HEADERS, timeout=25)
                   r.raise_for_status()
-                  xml_text = r.text
-
-                  # El XML puede tener namespace — los quitamos
-                  xml_clean = re.sub(r'\s+xmlns[^"]*"[^"]*"', '', xml_text)
+                  xml_clean = re.sub(r'\s+xmlns[^"]*"[^"]*"', '', r.text)
                   root = ET.fromstring(xml_clean)
-
-                  # Buscar NUM_VALOR en todo el árbol (ignora namespace)
-                  values = []
-                  for elem in root.iter():
-                      tag = elem.tag.split('}')[-1]
-                      if tag == 'NUM_VALOR' and elem.text:
-                          txt = elem.text.strip().replace(',', '.')
+                  vals = []
+                  for el in root.iter():
+                      tag = el.tag.split('}')[-1]
+                      if tag == 'NUM_VALOR' and el.text:
                           try:
-                              v = float(txt)
+                              v = float(el.text.strip().replace(',', '.'))
                               if v > 0:
-                                  values.append(v)
+                                  vals.append(v)
                           except ValueError:
                               pass
-
-                  if values:
-                      result = round(values[-1], 4)
-                      print(f'  ✅ BCCR {label}({indicador_code}) = {result}')
+                  if vals:
+                      result = round(vals[-1], 4)
+                      print(f'  ✅ BCCR {label} = {result}')
                       return result
+                  # Si la respuesta tiene el mensaje de error específico
+                  if 'No se encontró una suscripción' in r.text:
+                      print(f'  ❌ BCCR {label}: email/token no coinciden con la suscripción', file=sys.stderr)
+                      print(f'     → Verificar en: https://www.bccr.fi.cr/indicadores-economicos/servicio-web', file=sys.stderr)
                   else:
-                      print(f'  ⚠ BCCR {label}({indicador_code}): XML sin valores — respuesta: {xml_text[:200]}',
-                            file=sys.stderr)
-                      return None
-
+                      print(f'  ❌ BCCR {label}: XML sin valores. Respuesta: {r.text[:150]}', file=sys.stderr)
+                  return None
               except Exception as e:
-                  print(f'  ❌ BCCR {label}({indicador_code}) error: {e}', file=sys.stderr)
+                  print(f'  ❌ BCCR {label}({code}): {e}', file=sys.stderr)
                   return None
 
+          # ─── TC SIN TOKEN: exchangecr.onrender.com como alternativa ─
+          def tc_sin_token():
+              """Tipo de cambio USD→CRC desde API pública (sin auth)."""
+              urls = [
+                  'https://exchangecr.onrender.com/api/tipodecambio',
+                  'https://tipodecambio.pythonanywhere.com/api/',
+              ]
+              for url in urls:
+                  try:
+                      r = requests.get(url, headers=HEADERS, timeout=15)
+                      r.raise_for_status()
+                      data = r.json()
+                      # Formatos posibles: {venta: X}, {sell: X}, {USD: {venta: X}}
+                      for key in ['venta', 'sell', 'selling', 'compraventa']:
+                          if key in data:
+                              v = float(str(data[key]).replace(',', '.'))
+                              if 400 < v < 900:
+                                  print(f'  ✅ TC fallback ({url}): {v}')
+                                  return round(v)
+                      # Buscar cualquier valor numérico en rango 400-900
+                      for val in data.values():
+                          try:
+                              v = float(str(val).replace(',', '.'))
+                              if 400 < v < 900:
+                                  print(f'  ✅ TC fallback ({url}): {v}')
+                                  return round(v)
+                          except (ValueError, TypeError):
+                              pass
+                  except Exception as e:
+                      print(f'  ⚠ TC fallback {url}: {e}', file=sys.stderr)
+              return None
+
+          # ─── FRED (stlouisfed.org) — sin auth ────────────────────────
           def fred_fetch(series_id):
-              """Obtiene el último valor de FRED (stlouisfed.org) — sin auth."""
               try:
                   url = f'https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}'
                   r = requests.get(url, headers=HEADERS, timeout=25)
@@ -123,58 +166,125 @@ jobs:
                           except ValueError:
                               pass
               except Exception as e:
-                  print(f'  ❌ FRED {series_id} error: {e}', file=sys.stderr)
+                  print(f'  ❌ FRED {series_id}: {e}', file=sys.stderr)
               return None
 
-          def camara_fetch(url, label=''):
-              """Extrae TRI 3M/6M/12M del HTML de Cámara de Bancos."""
+          # ─── CÁMARA DE BANCOS — BeautifulSoup con parseo de tablas ──
+          # El sitio es WordPress con JS pero los valores están en el HTML inicial
+          # en tablas. Usamos BS4 para encontrarlos robustamente.
+          def camara_fetch(url, label):
               try:
-                  r = requests.get(url, headers=HEADERS, timeout=25)
+                  r = requests.get(url, headers={**HEADERS, 'Accept-Language': 'es'}, timeout=25)
                   r.raise_for_status()
-                  text = r.text.replace('\n', ' ').replace('\r', ' ')
+                  soup = BeautifulSoup(r.text, 'lxml')
 
-                  def find_rate(pattern):
-                      m = re.search(pattern, text, re.IGNORECASE)
-                      if m:
-                          try:
-                              v = float(m.group(1).replace(',', '.'))
-                              return round(v, 4) if 0 < v < 30 else None
-                          except ValueError:
-                              pass
-                      return None
+                  # Patrón: busca números decimales con 2-4 decimales en rango 0.1–25
+                  NUM_PAT = re.compile(r'^(\d{1,2}[,.]?\d{0,4})$')
 
-                  t3  = find_rate(r'3\s*meses?[^%]{0,120}?(\d{1,2}[,.]\d{1,4})\s*%')
-                  t6  = find_rate(r'6\s*meses?[^%]{0,120}?(\d{1,2}[,.]\d{1,4})\s*%')
-                  t12 = find_rate(r'12\s*meses?[^%]{0,120}?(\d{1,2}[,.]\d{1,4})\s*%')
-                  print(f'  ✅ Cámara {label}: 3M={t3} 6M={t6} 12M={t12}')
-                  return {'tri3': t3, 'tri6': t6, 'tri12': t12}
+                  def parse_num(txt):
+                      txt = txt.strip().replace(',', '.').replace('%', '').replace('\xa0', '')
+                      try:
+                          v = float(txt)
+                          return v if 0.1 < v < 25 else None
+                      except ValueError:
+                          return None
+
+                  # Estrategia 1: buscar en tablas HTML
+                  tri3 = tri6 = tri12 = None
+                  for table in soup.find_all('table'):
+                      rows = table.find_all('tr')
+                      for i, row in enumerate(rows):
+                          cells = [td.get_text(strip=True) for td in row.find_all(['th', 'td'])]
+                          row_text = ' '.join(cells).lower()
+                          # Busca la fila de cabecera con "3 mes"
+                          if '3' in row_text and ('mes' in row_text or 'month' in row_text):
+                              # Extraer índices de columnas para 3M, 6M, 12M
+                              col3 = col6 = col12 = -1
+                              for j, cell in enumerate(cells):
+                                  c = cell.lower()
+                                  if re.search(r'\b3\b.*mes|\b3\s*m\b', c): col3 = j
+                                  if re.search(r'\b6\b.*mes|\b6\s*m\b', c): col6 = j
+                                  if re.search(r'\b12\b.*mes|\b12\s*m\b', c): col12 = j
+                              # Leer las siguientes filas de datos
+                              for data_row in rows[i+1:i+5]:
+                                  data_cells = [td.get_text(strip=True) for td in data_row.find_all('td')]
+                                  if not data_cells:
+                                      continue
+                                  def safe_get(idx):
+                                      if 0 <= idx < len(data_cells):
+                                          return parse_num(data_cells[idx])
+                                      return None
+                                  v3  = safe_get(col3)
+                                  v6  = safe_get(col6)
+                                  v12 = safe_get(col12)
+                                  if any(v is not None for v in [v3, v6, v12]):
+                                      if tri3 is None and v3:  tri3  = v3
+                                      if tri6 is None and v6:  tri6  = v6
+                                      if tri12 is None and v12: tri12 = v12
+                                  if tri3 and tri6 and tri12:
+                                      break
+                          if tri3 and tri6 and tri12:
+                              break
+
+                  # Estrategia 2: buscar en el texto plano del body con regex
+                  if not (tri3 and tri6 and tri12):
+                      body = soup.get_text(separator=' ')
+                      # Buscamos patrones como "3 meses ... 3.35%" o similar
+                      for pat, var in [
+                          (r'3\s*mes[^\d]{1,60}?(\d{1,2}[.,]\d{1,4})\s*%', 'tri3'),
+                          (r'6\s*mes[^\d]{1,60}?(\d{1,2}[.,]\d{1,4})\s*%', 'tri6'),
+                          (r'12\s*mes[^\d]{1,60}?(\d{1,2}[.,]\d{1,4})\s*%', 'tri12'),
+                      ]:
+                          m = re.search(pat, body, re.IGNORECASE | re.DOTALL)
+                          if m:
+                              v = parse_num(m.group(1))
+                              if v:
+                                  if var == 'tri3'  and not tri3:  tri3  = v
+                                  if var == 'tri6'  and not tri6:  tri6  = v
+                                  if var == 'tri12' and not tri12: tri12 = v
+
+                  if tri3 or tri6 or tri12:
+                      print(f'  ✅ Cámara {label}: 3M={tri3} 6M={tri6} 12M={tri12}')
+                  else:
+                      print(f'  ⚠ Cámara {label}: no se encontraron valores en el HTML')
+                      print(f'     (el sitio puede estar usando JS para cargar datos)', file=sys.stderr)
+
+                  return {'tri3': tri3, 'tri6': tri6, 'tri12': tri12}
 
               except Exception as e:
-                  print(f'  ❌ Cámara {label} error: {e}', file=sys.stderr)
+                  print(f'  ❌ Cámara {label}: {e}', file=sys.stderr)
                   return {'tri3': None, 'tri6': None, 'tri12': None}
 
           # ─── Cargar rates.json existente como fallback ───────────────
           try:
               with open('rates.json') as f:
                   existing = json.load(f)
-              print(f'Cargado rates.json existente (updated: {existing.get("updated","?")})')
+              print(f'Cargado rates.json existente ({existing.get("updated","?")})')
           except Exception:
               existing = {}
-              print('No se encontró rates.json existente — usando ceros como fallback')
 
-          def use(new_val, key, label=''):
-              if new_val is not None and new_val > 0:
-                  return new_val
+          def use(new_val, key):
+              if new_val is not None:
+                  try:
+                      if float(new_val) > 0:
+                          return new_val
+                  except (TypeError, ValueError):
+                      pass
               old = existing.get(key)
               if old is not None:
-                  print(f'  ↩ {key}: fallback a valor existente {old}', file=sys.stderr)
+                  print(f'  ↩ {key}: usando existente {old}', file=sys.stderr)
               return old
 
-          # ─── Ejecutar todos los fetches ──────────────────────────────
+          # ─── EJECUTAR TODOS LOS FETCHES ──────────────────────────────
           print('\n→ BCCR: TBP (423), TED (23698), TC-venta (318)...')
-          tbp  = bccr_fetch(423,   'TBP')
-          ted  = bccr_fetch(23698, 'TED')
-          tc   = bccr_fetch(318,   'TC-venta')
+          tbp = bccr_fetch(423,   'TBP')
+          ted = bccr_fetch(23698, 'TED')
+          tc  = bccr_fetch(318,   'TC-venta')
+
+          # Si BCCR no funcionó, intentar TC desde API alternativa
+          if tc is None:
+              print('→ TC: intentando fuente alternativa sin token...')
+              tc = tc_sin_token()
 
           print('\n→ FRED: Prime Rate, SOFR 90d, SOFR 180d...')
           prime = fred_fetch('DPRIME')
@@ -187,11 +297,11 @@ jobs:
           print('\n→ Cámara de Bancos (dólares)...')
           usd = camara_fetch('https://camaradebancos.fi.cr/dolares/', 'USD')
 
-          # ─── Construir rates.json ─────────────────────────────────────
+          # ─── CONSTRUIR rates.json ─────────────────────────────────────
           rates = {
               '_comment': 'Auto-actualizado por GitHub Actions. No editar manualmente.',
               'updated':  NOW.strftime('%Y-%m-%dT%H:%M:%SZ'),
-              'source':   'BCCR gee.bccr.fi.cr · FRED stlouisfed.org · Cámara de Bancos',
+              'source':   'BCCR · FRED · Cámara de Bancos',
               'tbp':    use(tbp,          'tbp'),
               'ted':    use(ted,          'ted'),
               'tc':     use(tc,           'tc'),
@@ -209,9 +319,10 @@ jobs:
           with open('rates.json', 'w') as f:
               json.dump(rates, f, indent=2, ensure_ascii=False)
 
+          display = {k: v for k, v in rates.items()
+                     if not k.startswith('_') and k not in ('source', 'updated')}
           print(f'\n✅ rates.json guardado: {rates["updated"]}')
-          display = {k: v for k, v in rates.items() if not k.startswith('_') and k != 'source'}
-          print(json.dumps(display, indent=2))
+          print(json.dumps({'updated': rates['updated'], **display}, indent=2))
           PYEOF
 
       - name: Commit y push rates.json
