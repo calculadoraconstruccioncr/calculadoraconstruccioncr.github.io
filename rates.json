@@ -1,17 +1,23 @@
 {
-  "_comment": "Auto-actualizado por GitHub Actions. No editar manualmente.",
-  "updated": "2026-04-21T21:37:47Z",
-  "source": "BCCR · FRED · Cámara de Bancos",
-  "tbp": 3.66,
-  "ted": 3.12,
-  "tc": 473,
+  "_comment": "Auto-actualizado por GitHub Actions. Costos_m2 actualizados manualmente abril 2026.",
+  "updated": "2026-04-21T22:00:00Z",
+  "source": "BCCR gee.bccr.fi.cr · FRED stlouisfed.org · Cámara de Bancos · Mercado CR 2026",
+  "tbp":   3.61,
+  "ted":   3.03,
+  "tc":    458,
   "prime": 6.75,
-  "sofr3": 3.6687,
-  "sofr6": 3.7991,
-  "tri3c": 3.44,
-  "tri6c": 5.56,
-  "tri12c": 6.96,
-  "tri3d": 1.58,
-  "tri6d": 2.98,
-  "tri12d": 4.19
+  "sofr3": 3.67,
+  "sofr6": 3.80,
+  "tri3c": 3.35,
+  "tri6c": 5.38,
+  "tri12c": 6.25,
+  "tri3d": 2.98,
+  "tri6d": 3.35,
+  "tri12d": 4.19,
+  "costos_m2": {
+    "_nota": "Costo directo de obra (materiales+mano de obra) sin honorarios ni permisos. Actualizado abr-2026 según CICSA, Batsú Architecture y CJ-Arq. Se suman honorarios CFIA ~12%, permisos ~2%, INS ~3.75% y contingencia.",
+    "basico":     340000,
+    "intermedio": 425000,
+    "alto":       520000
+  }
 }
