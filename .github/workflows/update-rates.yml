@@ -41,6 +41,26 @@ jobs:
           BCCR_TOKEN = os.environ.get('BCCR_TOKEN')
           BCCR_EMAIL = os.environ.get('BCCR_EMAIL')
 
+          # 🔍 DEBUG SECRETS
+          print("🔍 DEBUG SECRETS:")
+          print("BCCR_TOKEN existe:", "YES" if BCCR_TOKEN else "NO")
+
+          if BCCR_TOKEN:
+              print("BCCR_TOKEN preview:", BCCR_TOKEN[:4] + "..." + BCCR_TOKEN[-4:])
+          else:
+              print("BCCR_TOKEN preview: NONE")
+
+          print("BCCR_EMAIL:", BCCR_EMAIL if BCCR_EMAIL else "NONE")
+
+          # Validación básica
+          if not BCCR_TOKEN or len(BCCR_TOKEN) < 10:
+              print("❌ TOKEN inválido o vacío", file=sys.stderr)
+              sys.exit(1)
+
+          if not BCCR_EMAIL or "@" not in BCCR_EMAIL:
+              print("❌ EMAIL inválido", file=sys.stderr)
+              sys.exit(1)
+
           HEADERS = {
               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36'
           }
