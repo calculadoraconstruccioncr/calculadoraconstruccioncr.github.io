@@ -1840,7 +1840,7 @@
     <div style="display:flex;flex-direction:column;gap:0;">
       <details style="border-bottom:1px solid #e5e7eb;padding:16px 0;" open>
         <summary style="font-size:0.98rem;font-weight:700;color:#1a2e1a;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">How much does it cost to build a 100 m² house in Costa Rica?<span style="color:#27ae60;font-size:1.2rem;flex-shrink:0;margin-left:12px;">+</span></summary>
-        <p style="font-size:0.9rem;line-height:1.75;color:#374151;margin-top:12px;">For a 100 m² home with intermediate finish in the GAM, construction cost ranges ₡35–₡39 million (₡450,000–₡520,000/m²). Adding fees (≈₡4.5M), permits (≈₡700K), INS (≈₡1.3M) and 10% contingency (≈₡3.9M), the total budget sits between ₡45–₡50 million. Use the calculator above for a personalized estimate.</p>
+        <p style="font-size:0.9rem;line-height:1.75;color:#374151;margin-top:12px;">For a 100 m² home with intermediate finish in the GAM, construction cost ranges ₡45–₡58 million (₡450,000–₡580,000/m²). Adding fees (≈₡5.5M), permits (≈₡900K), INS (≈₡1.5M) and 8% contingency (≈₡4.5M), the total budget sits between ₡57–₡73 million. Use the calculator above for a personalized estimate.</p>
       </details>
       <details style="border-bottom:1px solid #e5e7eb;padding:16px 0;">
         <summary style="font-size:0.98rem;font-weight:700;color:#1a2e1a;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;">How long does it take to build a house in Costa Rica?<span style="color:#27ae60;font-size:1.2rem;flex-shrink:0;margin-left:12px;">+</span></summary>
@@ -3071,12 +3071,47 @@
     });
   }
 
+
+  // ── Correcciones de tooltips tras applyLang() ─────────────────────────────
+  // applyLang() sobreescribe data-tip con valores de LANG que tienen precios viejos.
+  // Estos overrides aseguran que los precios actualizados (2026) se muestren siempre.
+  var tipUpdates = {
+    'tip_002': {
+      es: 'Define el nivel de materiales y terminaciones: Básico ₡350K/m² (cerámica básica, ventanas estándar, sin cielos, pintura simple), Intermedio ₡450K/m² (porcelanato, ventanas aluminio, cielos lisos, cocina funcional con isla), Alto ₡580K/m² (mármol, ventanas vidrio templado, cielos decorativos, cocina equipada, domótica). Promedios del mercado CR 2026 según CICSA/CFIA.',
+      en: 'Defines materials and finish level: Basic ₡350K/m² (basic ceramic, standard windows, no dropped ceilings, simple paint), Intermediate ₡450K/m² (porcelain tile, aluminum windows, smooth ceilings, functional kitchen), High-End ₡580K/m² (marble, tempered glass windows, decorative ceilings, equipped kitchen, home automation). CR market averages 2026 per CICSA/CFIA.'
+    },
+    'tip_011': {
+      es: 'Precios aproximados de referencia basados en portales inmobiliarios CR 2026 (CRPropiedad, Encuentra24). Los precios de terreno varían significativamente por micro-ubicación, acceso, servicios y zonificación. Use solo como punto de partida.',
+      en: 'Approximate reference prices based on CR real estate portals 2026 (CRPropiedad, Encuentra24). Land prices vary significantly by micro-location, access, utilities, and zoning. Use as a starting point only.'
+    },
+    'tip_006': {
+      es: 'Piscina residencial estándar (~8×4 m). Precio en USD que se convierte al tipo de cambio. Precio de mercado CR 2026: $10,000–$18,000 (con acabados básicos a medios). Incluye excavación, estructura, acabados y equipo de filtración básico. No incluye cerramiento ni calefacción.',
+      en: 'Standard residential pool (~8×4 m). Price in USD converted at current exchange rate. CR market price 2026: $10,000–$18,000 (basic to mid-range finishes). Includes excavation, structure, finishes and basic filtration equipment. Does not include enclosure or heating.'
+    },
+    'tip_058': {
+      es: 'Porcentaje del año que la propiedad estará desocupada. El mercado CR 2026 está muy tensionado: oferta bajó ~2.600 unidades en 2024 (INEC). Vacancia urbana GAM estimada: 4–8%. Zonas turísticas: 15–30% por estacionalidad. Fuente: CENFI/INEC 2026.',
+      en: 'Percentage of the year the property will be vacant. The CR 2026 market is very tight: housing supply dropped ~2,600 units in 2024 (INEC). Estimated urban GAM vacancy: 4–8%. Tourist areas: 15–30% due to seasonality. Source: CENFI/INEC 2026.'
+    }
+  };
+
+  function applyTipUpdates(lang) {
+    Object.keys(tipUpdates).forEach(function(key) {
+      var el = document.querySelector('[data-tip-key="' + key + '"]');
+      if (el) {
+        var txt = tipUpdates[key][lang] || tipUpdates[key].es;
+        el.setAttribute('data-tip', txt);
+      }
+    });
+  }
+
   function applyEditorialLang() {
     var lang = (typeof state !== 'undefined' && state.lang) ? state.lang : 'es';
     document.body.classList.toggle('lang-en', lang === 'en');
     document.documentElement.lang = (lang === 'en') ? 'en' : 'es';
     try { localStorage.setItem('calc-cr-lang', lang); } catch (e) {}
     applyFooterLang(lang);
+    // Re-apply tooltip corrections AFTER applyLang() (which is called before this)
+    applyTipUpdates(lang);
   }
 
   window.addEventListener('load', function () {
