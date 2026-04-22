@@ -1635,11 +1635,41 @@
 <script src="app.js"></script>
 <script src="rates-loader.js"></script>
 <script>
-// iniciarCalculadora: scroll suavemente a la calculadora (siempre visible)
-function iniciarCalculadora() {
-  var el = document.getElementById('calculadora');
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
+// ── iniciarCalculadora ─────────────────────────────────────────
+// app.js registra iniciarCalculadora via window[obfuscated] al final de su IIFE.
+// Esa función: 1) muestra #calculadora 2) OCULTA #seo-content 3) llama render() 4) scrollea.
+// Necesitamos render() pero queremos mantener seo-content visible.
+// Solución: envolver la función original en un load listener.
+window.addEventListener('load', function() {
+  var _origIniciar = window.iniciarCalculadora;
+
+  window.iniciarCalculadora = function() {
+    // Llamar la función original de app.js → esto hace render() ✅
+    if (typeof _origIniciar === 'function') {
+      _origIniciar();
+    } else if (typeof render === 'function') {
+      render();
+    }
+    // app.js oculta seo-content — lo restauramos de inmediato
+    var seo = document.getElementById('seo-content');
+    if (seo) seo.style.display = '';
+
+    // Scroll suave a la calculadora si se llamó desde el botón
+    var el = document.getElementById('calculadora');
+    if (el) setTimeout(function() {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  };
+
+  // AUTO-TRIGGER al cargar la página para que render() se llame
+  // y los gráficos, timeline, comparador, ROI, tabla de amortización
+  // se inicialicen correctamente desde el primer momento.
+  setTimeout(function() {
+    if (typeof window.iniciarCalculadora === 'function') {
+      window.iniciarCalculadora();
+    }
+  }, 200);
+});
 
 // ── EDITORIAL BILINGUAL HOOK ──────────────────────────
 // Wraps the existing toggleLang() (from obfuscated app.js)
