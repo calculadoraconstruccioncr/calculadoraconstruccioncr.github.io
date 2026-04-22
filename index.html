@@ -1390,6 +1390,12 @@
   /* Abono monto: ₡ symbol goes on the LEFT to avoid conflict with number spinners */
   #abono-monto-unit { left: 10px; right: auto; }
   #abono-monto { padding-left: 28px; padding-right: 6px; }
+
+  /* Garantizar que los canvas de Chart.js tengan ancho completo */
+  #pieChart, #amorChart {
+    width: 100% !important;
+    display: block;
+  }
 </style>
 </head>
 <body>
@@ -3001,105 +3007,124 @@
 <script src="app.js"></script>
 <script src="rates-loader.js"></script>
 <script>
-// ══ BOOTSTRAP v3 ════════════════════════════════════════════════════════════
-// CAUSA RAÍZ CONFIRMADA: render() y todas las sub-funciones son globales.
-// El problema es de TIMING: cuando app.js llama render() sincrónicamente, 
-// el canvas de Chart.js puede tener width=0 si el layout aún no se ha pintado.
-// Chart.js renderiza el chart vacío. Aunque luego se muestre el canvas, el chart
-// queda "atascado" porque Chart.js guarda la referencia al contexto 2D inicial.
+// ══ BOOTSTRAP v4 ════════════════════════════════════════════════════════════
+// CAUSA RAÍZ CONFIRMADA:
+//   render() en app.js llama renderCharts() que usa `new Chart(canvas, {responsive:false})`
+//   El canvas tiene height=240 pero SIN width → Chart.js usa canvas.width = 300 (default browser).
+//   Con responsive:false Chart.js NO lee el ancho CSS, solo el atributo HTML.
+//   Resultado: gráfico renderiza con tamaño fijo pequeño o con error interno.
 //
-// SOLUCIÓN: disparar 'input' en el elemento 'area' (el listener más básico de 
-// app.js que llama render()), Y llamar render() directamente, Y llamar cada
-// función de render individualmente como respaldo.
-// Todo esto después de window.load cuando el layout YA está finalizado.
+//   SI renderCharts() tira error → render() se detiene → amortData nunca se setea
+//   → renderAmortTable() nunca se llama → tabla de amortización vacía.
+//
+// SOLUCIÓN:
+//   1. Monkey-patch renderCharts: reemplazar antes de render() con versión
+//      que establece el ancho del canvas explícitamente y CAPTURA errores.
+//   2. Monkey-patch todas las sub-funciones de render() con try/catch para
+//      que render() SIEMPRE llegue hasta amortData y renderAmortTable().
+//   3. Después de render(), forzar redibujado de Chart.js con resize.
 
 (function () {
   'use strict';
 
-  // ── Llamar render() con try/catch protegido ───────────────────────────────
+  // ── 1. Monkey-patch: envolver sub-funciones con try/catch ─────────────────
+  // Esto garantiza que render() SIEMPRE complete hasta el final,
+  // incluyendo amortData = buildAmortData() y renderAmortTable().
+  function patchRenderFunctions() {
+    var toWrap = [
+      'renderCharts', 'renderAmortChart', 'renderTimeline',
+      'renderBancos', 'renderIngMin', 'renderAbonos',
+      'renderEscenarios', 'renderROI', 'renderExpo'
+    ];
+    toWrap.forEach(function(name) {
+      var orig = window[name];
+      if (typeof orig === 'function') {
+        window[name] = function() {
+          // Antes de renderCharts: asegurar que los canvas tengan width
+          if (name === 'renderCharts' || name === 'renderAmortChart') {
+            ['pieChart', 'amorChart'].forEach(function(id) {
+              var c = document.getElementById(id);
+              if (c && (!c.width || c.width < 50)) {
+                c.width = c.parentElement
+                  ? (c.parentElement.clientWidth || c.parentElement.offsetWidth || 600)
+                  : 600;
+              }
+            });
+          }
+          try { return orig.apply(this, arguments); }
+          catch(e) { /* render() continúa sin caerse */ }
+        };
+      }
+    });
+  }
+
+  // ── 2. Redibujado forzado de charts post-render ───────────────────────────
+  function forceChartRedraw() {
+    ['pieChart', 'amorChart'].forEach(function(id) {
+      var c = document.getElementById(id);
+      if (!c) return;
+      // Asegurar dimensiones
+      var parent = c.parentElement;
+      var w = parent ? (parent.clientWidth || parent.offsetWidth) : 0;
+      if (w > 0 && c.width !== w) {
+        c.width = w;
+      }
+    });
+    // Dispatch resize: Chart.js instances escuchan este evento para redibujar
+    try { window.dispatchEvent(new Event('resize')); } catch(e) {}
+  }
+
+  // ── 3. safeRender: render() + redibujado de charts ───────────────────────
   function safeRender() {
     if (typeof render === 'function') {
       try { render(); } catch(e) {}
     }
-    // Forzar Chart.js a recalcular todos los charts
-    try { window.dispatchEvent(new Event('resize')); } catch(e) {}
+    setTimeout(forceChartRedraw, 50);
   }
 
-  // ── Llamar sub-funciones directamente como respaldo ───────────────────────
-  function renderAllSections() {
-    var calc = null;
-    if (typeof calculate === 'function') {
-      try { calc = calculate(); } catch(e) {}
-    }
-    if (!calc) return;
-
-    // Gráficos (Chart.js)
-    if (typeof renderCharts === 'function') try { renderCharts(calc); } catch(e) {}
-    // Timeline de construcción
-    if (typeof renderTimeline === 'function') try { renderTimeline(calc); } catch(e) {}
-    // Tabla de amortización
-    if (typeof buildAmortData === 'function') try {
-      window.amortData = buildAmortData(calc);
-      window.amortCurPage = 0;
-      if (typeof updateAmortPills === 'function') updateAmortPills(calc);
-      if (typeof renderAmortTable === 'function') renderAmortTable();
-      if (typeof renderAmortChart === 'function') renderAmortChart(calc, false);
-    } catch(e) {}
-    // Comparador de bancos
-    if (typeof renderBancos === 'function') try { renderBancos(calc); } catch(e) {}
-    // Expo Construcción
-    if (typeof renderExpo === 'function') try { renderExpo(calc); } catch(e) {}
-    // Análisis ROI
-    if (typeof renderROI === 'function') try { renderROI(calc); } catch(e) {}
-    // Simulador de abonos
-    if (typeof renderAbonos === 'function') try { renderAbonos(calc); } catch(e) {}
-    // Ingreso mínimo
-    if (typeof renderIngMin === 'function') try { renderIngMin(calc); } catch(e) {}
-    // Comparador de escenarios
-    if (typeof renderEscenarios === 'function') try { renderEscenarios(); } catch(e) {}
-    // Chart.js resize para corregir canvas vacíos
-    try { window.dispatchEvent(new Event('resize')); } catch(e) {}
-  }
-
+  // ── 4. Window load: orquestar todo ────────────────────────────────────────
   window.addEventListener('load', function () {
 
-    // ── 1. iniciarCalculadora: SIN ocultar seo-content ───────────────────
+    // a) Monkey-patch primero (antes de que se llame cualquier render)
+    patchRenderFunctions();
+
+    // b) Reemplazar iniciarCalculadora (botón hero) sin ocultar seo-content
     window.iniciarCalculadora = function () {
       var el = document.getElementById('calculadora');
       if (el) el.style.display = 'block';
       safeRender();
-      setTimeout(renderAllSections, 50);
       if (el) setTimeout(function () {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
     };
 
-    // ── 2. Primer disparo: simular interacción del usuario ────────────────
-    // Disparar 'input' en el campo area → usa el listener de app.js directamente
+    // c) Trigger inmediato: el layout ya está listo en window.load
+    //    Simular input en 'area' activa el listener nativo de app.js
     setTimeout(function () {
       var areaEl = document.getElementById('area');
       if (areaEl) {
-        try { areaEl.dispatchEvent(new Event('input', { bubbles: true })); } catch(e) {}
+        try { areaEl.dispatchEvent(new Event('input', { bubbles: true })); }
+        catch(e) {}
       }
-      // También llamar render() directo por si acaso
-      safeRender();
-    }, 150);
+    }, 100);
 
-    // ── 3. Segundo disparo: renderizar secciones individuales ─────────────
-    setTimeout(renderAllSections, 400);
+    // d) render() completo a los 300ms
+    setTimeout(safeRender, 300);
 
-    // ── 4. Tercer disparo: con delay para datos de tasas async ────────────
-    setTimeout(renderAllSections, 2500);
+    // e) render() de respaldo a los 1000ms (después de fetch de tasas)
+    setTimeout(safeRender, 1000);
+
+    // f) render() final a los 3000ms (tasas async completadas)
+    setTimeout(safeRender, 3000);
   });
 
-  // ── 5. Toggle idioma editorial ────────────────────────────────────────────
+  // ── 5. Toggle de idioma editorial ─────────────────────────────────────────
   function applyEditorialLang() {
     var lang = (typeof state !== 'undefined' && state.lang) ? state.lang : 'es';
     document.body.classList.toggle('lang-en', lang === 'en');
     document.documentElement.lang = (lang === 'en') ? 'en' : 'es';
     try { localStorage.setItem('calc-cr-lang', lang); } catch (e) {}
   }
-
   window.addEventListener('load', function () {
     var origToggle = window.toggleLang;
     if (typeof origToggle === 'function') {
@@ -3127,7 +3152,7 @@
     };
   });
 
-  // ── 7. Eliminar overlay residual ──────────────────────────────────────────
+  // ── 7. Limpiar overlay residual ───────────────────────────────────────────
   window.addEventListener('DOMContentLoaded', function () {
     var ov = document.getElementById('rates-overlay');
     if (ov) ov.remove();
