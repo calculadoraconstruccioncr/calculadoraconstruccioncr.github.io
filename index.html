@@ -1387,15 +1387,9 @@
 /* moneda bar mobile fallback */
 @media (max-width:640px){#moneda-bar-mobile{display:flex!important;}}
 
-  /* Hide number-input spinners that overlap the currency unit symbol */
-  .input-group input[type="number"]::-webkit-outer-spin-button,
-  .input-group input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none; margin: 0;
-  }
-  .input-group input[type="number"] { -moz-appearance: textfield; }
-
-  /* Abono monto input: extra padding to avoid overlap with ₡ unit */
-  #abono-monto { padding-right: 36px !important; }
+  /* Abono monto: ₡ symbol goes on the LEFT to avoid conflict with number spinners */
+  #abono-monto-unit { left: 10px; right: auto; }
+  #abono-monto { padding-left: 28px; padding-right: 6px; }
 </style>
 </head>
 <body>
@@ -2598,7 +2592,7 @@
               <div class="abono-input-group">
                 <label><span data-i18n="lbl_abono_monto">Monto por abono</span> <span class="tip" data-tip="Cuánto abona al capital en cada pago extraordinario. Por defecto un aguinaldo estimado (1 mes de salario)." data-tip-key="tip_054">?</span></label>
                 <div class="input-group" style="margin:0;">
-                  <input type="number" id="abono-monto" min="0" step="50000"
+                  <input type="number" id="abono-monto" min="0" step="50000" value="50000"
                     style="padding:7px 10px;font-family:'DM Sans',sans-serif;font-size:0.88rem;">
                   <span class="input-unit" id="abono-monto-unit">₡</span>
                 </div>
@@ -2949,7 +2943,11 @@
         <button class="esc-save-btn" id="esc-save-btn" onclick="guardarEscenario()">
           <span data-i18n="btn_guardar">📌 Guardar escenario actual</span>
         </button>
-        <div class="esc-slots" id="esc-slots"></div>
+        <div class="esc-slots" id="esc-slots">
+        <div class="esc-slot" style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:50px;border:1.5px dashed var(--gray-300);background:var(--gray-50);font-size:0.78rem;color:var(--gray-400);">📌 Escenario 1</div>
+        <div class="esc-slot" style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:50px;border:1.5px dashed var(--gray-300);background:var(--gray-50);font-size:0.78rem;color:var(--gray-400);">📌 Escenario 2</div>
+        <div class="esc-slot" style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:50px;border:1.5px dashed var(--gray-300);background:var(--gray-50);font-size:0.78rem;color:var(--gray-400);">📌 Escenario 3</div>
+      </div>
         <button id="esc-clear-btn" onclick="limpiarEscenarios()" style="display:none;border:none;background:#fee2e2;color:#991b1b;border-radius:8px;padding:5px 12px;font-size:0.75rem;font-weight:700;cursor:pointer;margin-left:auto;" title="Eliminar todos los escenarios guardados"><span data-i18n="btn_limpiar">🗑️ Limpiar todos</span></button>
       </div>
       <div id="esc-content">
@@ -3003,54 +3001,98 @@
 <script src="app.js"></script>
 <script src="rates-loader.js"></script>
 <script>
-// ══ BOOTSTRAP ═══════════════════════════════════════════════════════════════
-// DIAGNÓSTICO CONFIRMADO (via Node.js test):
-//   - render() ES una función global (nivel superior de app.js, no dentro de IIFE)
-//   - app.js llama render() al final de su código sync (pos 502026)
-//   - EN EL BROWSER puede fallar un sub-módulo de render() (renderCharts, etc.)
-//     si el canvas no está completamente pintado o hay un error de timing
-//   - Cuando el usuario toca algo → el listener SÍ llama render() → secciones aparecen
+// ══ BOOTSTRAP v3 ════════════════════════════════════════════════════════════
+// CAUSA RAÍZ CONFIRMADA: render() y todas las sub-funciones son globales.
+// El problema es de TIMING: cuando app.js llama render() sincrónicamente, 
+// el canvas de Chart.js puede tener width=0 si el layout aún no se ha pintado.
+// Chart.js renderiza el chart vacío. Aunque luego se muestre el canvas, el chart
+// queda "atascado" porque Chart.js guarda la referencia al contexto 2D inicial.
 //
-// SOLUCIÓN: llamar render() múltiples veces con distintos delays desde window.load,
-// acompañado de resize event para reactivar Chart.js.
-// iniciarCalculadora se reemplaza para NUNCA ocultar seo-content.
+// SOLUCIÓN: disparar 'input' en el elemento 'area' (el listener más básico de 
+// app.js que llama render()), Y llamar render() directamente, Y llamar cada
+// función de render individualmente como respaldo.
+// Todo esto después de window.load cuando el layout YA está finalizado.
 
 (function () {
   'use strict';
 
-  // Función utilitaria para llamar render() con protección
+  // ── Llamar render() con try/catch protegido ───────────────────────────────
   function safeRender() {
-    if (typeof render !== 'function') return;
-    try { render(); } catch (e) { /* silencioso */ }
-    // Notificar a Chart.js que recalcule tamaños
-    try { window.dispatchEvent(new Event('resize')); } catch (e) {}
+    if (typeof render === 'function') {
+      try { render(); } catch(e) {}
+    }
+    // Forzar Chart.js a recalcular todos los charts
+    try { window.dispatchEvent(new Event('resize')); } catch(e) {}
   }
 
-  // ── 1. iniciarCalculadora: versión sin ocultar seo-content ────────────────
-  //    app.js define iniciarCalculadora() al final de su carga; la sobreescribimos.
-  //    IMPORTANTE: NO llamamos la versión original porque oculta seo-content
-  //    ANTES de llamar render(), lo que hace que Chart.js renderice en canvas 0×0.
+  // ── Llamar sub-funciones directamente como respaldo ───────────────────────
+  function renderAllSections() {
+    var calc = null;
+    if (typeof calculate === 'function') {
+      try { calc = calculate(); } catch(e) {}
+    }
+    if (!calc) return;
+
+    // Gráficos (Chart.js)
+    if (typeof renderCharts === 'function') try { renderCharts(calc); } catch(e) {}
+    // Timeline de construcción
+    if (typeof renderTimeline === 'function') try { renderTimeline(calc); } catch(e) {}
+    // Tabla de amortización
+    if (typeof buildAmortData === 'function') try {
+      window.amortData = buildAmortData(calc);
+      window.amortCurPage = 0;
+      if (typeof updateAmortPills === 'function') updateAmortPills(calc);
+      if (typeof renderAmortTable === 'function') renderAmortTable();
+      if (typeof renderAmortChart === 'function') renderAmortChart(calc, false);
+    } catch(e) {}
+    // Comparador de bancos
+    if (typeof renderBancos === 'function') try { renderBancos(calc); } catch(e) {}
+    // Expo Construcción
+    if (typeof renderExpo === 'function') try { renderExpo(calc); } catch(e) {}
+    // Análisis ROI
+    if (typeof renderROI === 'function') try { renderROI(calc); } catch(e) {}
+    // Simulador de abonos
+    if (typeof renderAbonos === 'function') try { renderAbonos(calc); } catch(e) {}
+    // Ingreso mínimo
+    if (typeof renderIngMin === 'function') try { renderIngMin(calc); } catch(e) {}
+    // Comparador de escenarios
+    if (typeof renderEscenarios === 'function') try { renderEscenarios(); } catch(e) {}
+    // Chart.js resize para corregir canvas vacíos
+    try { window.dispatchEvent(new Event('resize')); } catch(e) {}
+  }
+
   window.addEventListener('load', function () {
 
+    // ── 1. iniciarCalculadora: SIN ocultar seo-content ───────────────────
     window.iniciarCalculadora = function () {
       var el = document.getElementById('calculadora');
       if (el) el.style.display = 'block';
       safeRender();
+      setTimeout(renderAllSections, 50);
       if (el) setTimeout(function () {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 60);
+      }, 100);
     };
 
-    // ── Auto-trigger en 3 etapas ───────────────────────────────────────────
-    // Primera pasada (200ms): datos ya calculados, DOM estable
-    setTimeout(safeRender, 200);
-    // Segunda pasada (800ms): por si Chart.js necesitaba más tiempo
-    setTimeout(safeRender, 800);
-    // Tercera pasada (2200ms): cuando las tasas async hayan llegado
-    setTimeout(safeRender, 2200);
+    // ── 2. Primer disparo: simular interacción del usuario ────────────────
+    // Disparar 'input' en el campo area → usa el listener de app.js directamente
+    setTimeout(function () {
+      var areaEl = document.getElementById('area');
+      if (areaEl) {
+        try { areaEl.dispatchEvent(new Event('input', { bubbles: true })); } catch(e) {}
+      }
+      // También llamar render() directo por si acaso
+      safeRender();
+    }, 150);
+
+    // ── 3. Segundo disparo: renderizar secciones individuales ─────────────
+    setTimeout(renderAllSections, 400);
+
+    // ── 4. Tercer disparo: con delay para datos de tasas async ────────────
+    setTimeout(renderAllSections, 2500);
   });
 
-  // ── 2. Toggle idioma del contenido editorial ──────────────────────────────
+  // ── 5. Toggle idioma editorial ────────────────────────────────────────────
   function applyEditorialLang() {
     var lang = (typeof state !== 'undefined' && state.lang) ? state.lang : 'es';
     document.body.classList.toggle('lang-en', lang === 'en');
@@ -3061,38 +3103,31 @@
   window.addEventListener('load', function () {
     var origToggle = window.toggleLang;
     if (typeof origToggle === 'function') {
-      window.toggleLang = function () {
-        origToggle.call(this);
-        applyEditorialLang();
-      };
+      window.toggleLang = function () { origToggle.call(this); applyEditorialLang(); };
     }
     applyEditorialLang();
   });
 
-  // ── 3. Botón "Actualizar tasas" con rates.json + fetch en vivo ───────────
+  // ── 6. Botón "Actualizar tasas" ───────────────────────────────────────────
   window.addEventListener('load', function () {
     var origRefresh = window.refreshRatesManual;
     window.refreshRatesManual = function () {
-      var btn  = document.getElementById('btn-refresh-rates');
+      var btn = document.getElementById('btn-refresh-rates');
       var icon = document.getElementById('refresh-icon');
       if (icon) icon.style.animation = 'rov-spin 0.75s linear infinite';
-      if (btn)  btn.disabled = true;
-      if (typeof reloadRates === 'function') {
-        try { reloadRates(); } catch (e) {}
-      }
+      if (btn) btn.disabled = true;
+      if (typeof reloadRates === 'function') try { reloadRates(); } catch(e) {}
       setTimeout(function () {
-        if (typeof origRefresh === 'function') {
-          try { origRefresh(); } catch (e) {}
-        }
+        if (typeof origRefresh === 'function') try { origRefresh(); } catch(e) {}
         setTimeout(function () {
           if (icon) icon.style.animation = '';
-          if (btn)  btn.disabled = false;
+          if (btn) btn.disabled = false;
         }, 4000);
       }, 400);
     };
   });
 
-  // ── 4. Eliminar overlay si app.js lo recrea ──────────────────────────────
+  // ── 7. Eliminar overlay residual ──────────────────────────────────────────
   window.addEventListener('DOMContentLoaded', function () {
     var ov = document.getElementById('rates-overlay');
     if (ov) ov.remove();
