@@ -2967,12 +2967,12 @@
 <!-- FOOTER -->
 <footer>
   <p data-i18n="footer1">Calculadora de Construcción <strong>Costa Rica</strong> · Estimaciones de referencia actualizadas abril 2026 (BCCR, CICSA, CFIA).</p>
-  <p style="margin-top:4px;font-size:0.75rem;color:var(--gray-400);">Los costos reales varían por diseño, proveedor, zona y condiciones de mercado. <strong>Consulte siempre con un profesional inscrito en el CFIA.</strong> No constituye asesoría financiera.</p>
+  <p style="margin-top:4px;font-size:0.75rem;color:var(--gray-400);" data-i18n="footer_disclaimer">Los costos reales varían por diseño, proveedor, zona y condiciones de mercado. <strong>Consulte siempre con un profesional inscrito en el CFIA.</strong> No constituye asesoría financiera.</p>
   <p style="margin-top:6px;" data-i18n="footer2">Los costos reales pueden variar según el contratista, materiales y condiciones específicas del proyecto.</p>
   <p style="margin-top:10px; font-size:0.82rem;">
-    <a href="privacy.html" style="color:var(--green-500); text-decoration:none;">Política de Privacidad</a>
+    <a href="privacy.html" style="color:var(--green-500); text-decoration:none;" data-i18n="footer_privacy">Política de Privacidad</a>
     &nbsp;·&nbsp;
-    <a href="privacy.html#cookies" style="color:var(--green-500); text-decoration:none;">Cookies</a>
+    <a href="privacy.html#cookies" style="color:var(--green-500); text-decoration:none;" data-i18n="footer_cookies">Cookies</a>
   </p>
 </footer>
 
@@ -3007,88 +3007,84 @@
 <script src="app.js"></script>
 <script src="rates-loader.js"></script>
 <script>
-// ══ BOOTSTRAP v4 ════════════════════════════════════════════════════════════
-// CAUSA RAÍZ CONFIRMADA:
-//   render() en app.js llama renderCharts() que usa `new Chart(canvas, {responsive:false})`
-//   El canvas tiene height=240 pero SIN width → Chart.js usa canvas.width = 300 (default browser).
-//   Con responsive:false Chart.js NO lee el ancho CSS, solo el atributo HTML.
-//   Resultado: gráfico renderiza con tamaño fijo pequeño o con error interno.
+// ══ BOOTSTRAP v5 ════════════════════════════════════════════════════════════
+// CAUSA RAÍZ FINAL:
+//   1. Chart.js crea los gráficos responsive:true (usa ResizeObserver).
+//   2. El ResizeObserver es ASÍNCRONO: las callbacks van a la microtask queue.
+//   3. Cuando nuestra safeRender() llama render() → renderCharts() → new Chart():
+//      Chart.js crea el chart internamente, pero el ResizeObserver NO ha disparado aún.
+//      El canvas queda sin dimensiones hasta que el ResizeObserver dispara.
+//   4. Si en ese momento (ResizeObserver callback) el browser ya renderizó el layout,
+//      el chart SE DIBUJA. Si no, queda vacío.
+//   5. El problema real: llamar render() dos veces hace que el segundo destroy()
+//      limpie el chart que acababa de dibujarse correctamente.
 //
-//   SI renderCharts() tira error → render() se detiene → amortData nunca se setea
-//   → renderAmortTable() nunca se llama → tabla de amortización vacía.
-//
-// SOLUCIÓN:
-//   1. Monkey-patch renderCharts: reemplazar antes de render() con versión
-//      que establece el ancho del canvas explícitamente y CAPTURA errores.
-//   2. Monkey-patch todas las sub-funciones de render() con try/catch para
-//      que render() SIEMPRE llegue hasta amortData y renderAmortTable().
-//   3. Después de render(), forzar redibujado de Chart.js con resize.
+// SOLUCIÓN DEFINITIVA:
+//   - Llamar render() UNA sola vez por ciclo.
+//   - Después de render(), usar requestAnimationFrame para garantizar que
+//     Chart.js tenga tiempo de dibujar.
+//   - Llamar pieChart.resize() y amorChart.resize() explícitamente después del RAF.
+//   - Las variables pieChart/amorChart son top-level 'let' en app.js y son
+//     accesibles desde este script (comparten el mismo scope global de la página).
 
 (function () {
   'use strict';
 
-  // ── 1. Monkey-patch: envolver sub-funciones con try/catch ─────────────────
-  // Esto garantiza que render() SIEMPRE complete hasta el final,
-  // incluyendo amortData = buildAmortData() y renderAmortTable().
+  // ── Resize explícito de los charts ──────────────────────────────────────
+  function doResize() {
+    try {
+      if (typeof pieChart !== 'undefined' && pieChart && typeof pieChart.resize === 'function') {
+        pieChart.resize();
+      }
+      if (typeof amorChart !== 'undefined' && amorChart && typeof amorChart.resize === 'function') {
+        amorChart.resize();
+      }
+      // También forzar re-render vía window resize (Chart.js 4.x lo escucha)
+      window.dispatchEvent(new Event('resize'));
+    } catch(e) {}
+  }
+
+  function resizeCharts() {
+    // 3 intentos en distintos momentos para garantizar que Chart.js haya inicializado
+    requestAnimationFrame(function() {
+      doResize();
+      setTimeout(doResize, 100);
+      setTimeout(doResize, 300);
+    });
+  }
+
+  // ── safeRender: render() → esperar RAF → resize charts ───────────────────
+  function safeRender() {
+    if (typeof render === 'function') {
+      try { render(); } catch(e) {}
+    }
+    // Esperar al siguiente frame de animación para que Chart.js dibuje
+    requestAnimationFrame(function () {
+      resizeCharts();
+      // Segundo RAF por si el primero no alcanzó
+      requestAnimationFrame(resizeCharts);
+    });
+  }
+
+  // ── Patch de sub-funciones para evitar crashes silenciosos ────────────────
   function patchRenderFunctions() {
-    var toWrap = [
-      'renderCharts', 'renderAmortChart', 'renderTimeline',
-      'renderBancos', 'renderIngMin', 'renderAbonos',
-      'renderEscenarios', 'renderROI', 'renderExpo'
-    ];
-    toWrap.forEach(function(name) {
+    var names = ['renderCharts', 'renderAmortChart', 'renderTimeline', 'renderBancos',
+                 'renderIngMin', 'renderAbonos', 'renderEscenarios', 'renderROI', 'renderExpo'];
+    names.forEach(function(name) {
       var orig = window[name];
       if (typeof orig === 'function') {
         window[name] = function() {
-          // Antes de renderCharts: asegurar que los canvas tengan width
-          if (name === 'renderCharts' || name === 'renderAmortChart') {
-            ['pieChart', 'amorChart'].forEach(function(id) {
-              var c = document.getElementById(id);
-              if (c && (!c.width || c.width < 50)) {
-                c.width = c.parentElement
-                  ? (c.parentElement.clientWidth || c.parentElement.offsetWidth || 600)
-                  : 600;
-              }
-            });
-          }
-          try { return orig.apply(this, arguments); }
-          catch(e) { /* render() continúa sin caerse */ }
+          try { return orig.apply(this, arguments); } catch(e) {}
         };
       }
     });
   }
 
-  // ── 2. Redibujado forzado de charts post-render ───────────────────────────
-  function forceChartRedraw() {
-    ['pieChart', 'amorChart'].forEach(function(id) {
-      var c = document.getElementById(id);
-      if (!c) return;
-      // Asegurar dimensiones
-      var parent = c.parentElement;
-      var w = parent ? (parent.clientWidth || parent.offsetWidth) : 0;
-      if (w > 0 && c.width !== w) {
-        c.width = w;
-      }
-    });
-    // Dispatch resize: Chart.js instances escuchan este evento para redibujar
-    try { window.dispatchEvent(new Event('resize')); } catch(e) {}
-  }
-
-  // ── 3. safeRender: render() + redibujado de charts ───────────────────────
-  function safeRender() {
-    if (typeof render === 'function') {
-      try { render(); } catch(e) {}
-    }
-    setTimeout(forceChartRedraw, 50);
-  }
-
-  // ── 4. Window load: orquestar todo ────────────────────────────────────────
   window.addEventListener('load', function () {
-
-    // a) Monkey-patch primero (antes de que se llame cualquier render)
+    // 1. Monkey-patch para capturar errores silenciosos
     patchRenderFunctions();
 
-    // b) Reemplazar iniciarCalculadora (botón hero) sin ocultar seo-content
+    // 2. Reemplazar iniciarCalculadora (botón "Calcular") sin ocultar seo-content
     window.iniciarCalculadora = function () {
       var el = document.getElementById('calculadora');
       if (el) el.style.display = 'block';
@@ -3098,32 +3094,31 @@
       }, 100);
     };
 
-    // c) Trigger inmediato: el layout ya está listo en window.load
-    //    Simular input en 'area' activa el listener nativo de app.js
+    // 3. Simular input en 'area' para activar el listener nativo de app.js
+    //    Esto usa exactamente la misma ruta de código que cuando el usuario escribe.
     setTimeout(function () {
       var areaEl = document.getElementById('area');
       if (areaEl) {
-        try { areaEl.dispatchEvent(new Event('input', { bubbles: true })); }
-        catch(e) {}
+        try { areaEl.dispatchEvent(new Event('input', { bubbles: true })); } catch(e) {}
       }
-    }, 100);
+      // Después del input event (que llama render() internamente), resize charts
+      requestAnimationFrame(resizeCharts);
+    }, 50);
 
-    // d) render() completo a los 300ms
-    setTimeout(safeRender, 300);
+    // 4. Un segundo render completo a los 400ms
+    setTimeout(safeRender, 400);
 
-    // e) render() de respaldo a los 1000ms (después de fetch de tasas)
-    setTimeout(safeRender, 1000);
-
-    // f) render() final a los 3000ms (tasas async completadas)
-    setTimeout(safeRender, 3000);
+    // 5. Render final después de que lleguen las tasas async
+    setTimeout(safeRender, 2800);
   });
 
-  // ── 5. Toggle de idioma editorial ─────────────────────────────────────────
+  // ── Toggle de idioma editorial ─────────────────────────────────────────────
   function applyEditorialLang() {
     var lang = (typeof state !== 'undefined' && state.lang) ? state.lang : 'es';
     document.body.classList.toggle('lang-en', lang === 'en');
     document.documentElement.lang = (lang === 'en') ? 'en' : 'es';
     try { localStorage.setItem('calc-cr-lang', lang); } catch (e) {}
+    applyFooterLang(lang);
   }
   window.addEventListener('load', function () {
     var origToggle = window.toggleLang;
@@ -3133,7 +3128,7 @@
     applyEditorialLang();
   });
 
-  // ── 6. Botón "Actualizar tasas" ───────────────────────────────────────────
+  // ── Botón "Actualizar tasas" ───────────────────────────────────────────────
   window.addEventListener('load', function () {
     var origRefresh = window.refreshRatesManual;
     window.refreshRatesManual = function () {
@@ -3152,11 +3147,34 @@
     };
   });
 
-  // ── 7. Limpiar overlay residual ───────────────────────────────────────────
+  // ── Limpiar overlay residual ───────────────────────────────────────────────
   window.addEventListener('DOMContentLoaded', function () {
     var ov = document.getElementById('rates-overlay');
     if (ov) ov.remove();
   });
+
+
+  // ── Footer translations not covered by app.js LANG ────────────────────────
+  var footerTranslations = {
+    es: {
+      'footer_disclaimer': 'Los costos reales varían por diseño, proveedor, zona y condiciones de mercado. <strong>Consulte siempre con un profesional inscrito en el CFIA.</strong> No constituye asesoría financiera.',
+      'footer_privacy': 'Política de Privacidad',
+      'footer_cookies': 'Cookies'
+    },
+    en: {
+      'footer_disclaimer': 'Actual costs vary by design, contractor, region, and market conditions. <strong>Always consult a CFIA-registered professional.</strong> This does not constitute financial advice.',
+      'footer_privacy': 'Privacy Policy',
+      'footer_cookies': 'Cookies'
+    }
+  };
+
+  function applyFooterLang(lang) {
+    var t = footerTranslations[lang] || footerTranslations.es;
+    Object.keys(t).forEach(function(key) {
+      var el = document.querySelector('[data-i18n="' + key + '"]');
+      if (el) el.innerHTML = t[key];
+    });
+  }
 
 })();
 </script>
