@@ -1412,82 +1412,191 @@
   #abono-monto { padding-left: 28px; padding-right: 6px; }
 
 
-  /* ── Alquilar vs Comprar ─────────────────────────────────────────── */
-  .avc-grid {
+
+  /* ═══ ALQUILAR VS COMPRAR ════════════════════════════════════════ */
+  .avc-inputs-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 14px;
-    margin-top: 20px;
+    margin-top: 18px;
   }
-  @media (max-width: 600px) { .avc-grid { grid-template-columns: 1fr; } }
-  .avc-input-group label {
-    display: block;
+  @media (max-width: 720px) { .avc-inputs-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 480px) { .avc-inputs-grid { grid-template-columns: 1fr; } }
+
+  .avc-field label.avc-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
     font-size: 0.78rem;
     font-weight: 600;
     color: var(--gray-600);
     margin-bottom: 5px;
   }
+  .avc-pct-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 0 10px 0 0;
+    background: var(--white);
+    transition: border-color 0.15s;
+  }
+  .avc-pct-group:focus-within { border-color: var(--green-400); }
+  .avc-pct-group input {
+    border: none !important;
+    border-radius: 8px 0 0 8px;
+    padding: 8px 10px;
+    font-size: 0.88rem;
+    flex: 1;
+    min-width: 0;
+    outline: none;
+    background: transparent;
+  }
+  .avc-unit {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gray-400);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .avc-select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    color: var(--gray-800);
+    background: var(--white);
+    cursor: pointer;
+  }
+  .avc-select:focus { outline: none; border-color: var(--green-400); }
+
+  /* Verdict box */
   .avc-verdict-box {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 16px 20px;
+    gap: 14px;
+    padding: 14px 18px;
     border-radius: 12px;
-    border: 2px solid transparent;
-    margin-bottom: 16px;
+    border: 2px solid var(--gray-200);
     background: var(--gray-50);
-    border-color: var(--gray-200);
+    margin-bottom: 14px;
+    transition: all 0.3s;
   }
   .avc-verdict-box.buy  { background: #f0fdf4; border-color: #86efac; }
-  .avc-verdict-box.rent { background: #fef9c3; border-color: #fde047; }
+  .avc-verdict-box.rent { background: #fefce8; border-color: #fde047; }
   .avc-verdict-box.tie  { background: #f0f9ff; border-color: #7dd3fc; }
-  .avc-verdict-title { font-size: 1rem; font-weight: 700; color: var(--gray-900); }
-  .avc-verdict-sub   { font-size: 0.82rem; color: var(--gray-600); margin-top: 3px; }
-  .avc-kpi-row {
+  .avc-verdict-icon  { font-size: 1.8rem; flex-shrink: 0; }
+  .avc-verdict-title { font-size: 0.95rem; font-weight: 700; color: var(--gray-900); line-height: 1.3; }
+  .avc-verdict-sub   { font-size: 0.78rem; color: var(--gray-600); margin-top: 3px; }
+
+  /* KPI row */
+  .avc-kpis {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-top: 4px;
+    gap: 10px;
+    margin-bottom: 16px;
   }
-  @media (max-width: 600px) { .avc-kpi-row { grid-template-columns: 1fr; } }
+  @media (max-width: 540px) { .avc-kpis { grid-template-columns: 1fr; } }
   .avc-kpi {
     background: var(--white);
     border: 1px solid var(--gray-200);
     border-radius: 10px;
-    padding: 14px;
+    padding: 12px 14px;
     text-align: center;
   }
-  .avc-kpi-label { font-size: 0.72rem; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: .04em; }
-  .avc-kpi-val   { font-size: 1.25rem; font-weight: 800; color: var(--green-700); margin: 6px 0 4px; }
-  .avc-kpi-sub   { font-size: 0.72rem; color: var(--gray-400); }
-  .avc-breakdown {
-    margin-top: 12px;
-    border: 1px solid var(--gray-200);
-    border-radius: 8px;
-    overflow: hidden;
-    font-size: 0.8rem;
+  .avc-kpi-label { font-size: 0.7rem; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+  .avc-kpi-val   { font-size: 1.15rem; font-weight: 800; margin: 2px 0; }
+  .avc-kpi-val.green  { color: var(--green-700); }
+  .avc-kpi-val.orange { color: #b45309; }
+  .avc-kpi-sub   { font-size: 0.68rem; color: var(--gray-400); line-height: 1.3; }
+
+  /* Chart */
+  .avc-chart-section { margin-bottom: 14px; }
+  .avc-chart-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 8px;
   }
-  .avc-breakdown table { width: 100%; border-collapse: collapse; }
-  .avc-breakdown th {
+
+  /* Details / breakdown */
+  .avc-details { border: 1px solid var(--gray-200); border-radius: 10px; overflow: hidden; }
+  .avc-details-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: var(--green-700);
+    background: var(--gray-50);
+    list-style: none;
+    user-select: none;
+  }
+  .avc-details-summary::-webkit-details-marker { display: none; }
+  .avc-details[open] .avc-details-summary svg { transform: rotate(180deg); }
+  .avc-table-wrap { overflow-x: auto; }
+  .avc-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+  .avc-table thead th {
     background: var(--gray-100);
     padding: 7px 10px;
     text-align: right;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--gray-700);
-    font-size: 0.73rem;
     white-space: nowrap;
+    border-bottom: 1px solid var(--gray-200);
   }
-  .avc-breakdown th:first-child { text-align: left; }
-  .avc-breakdown td {
+  .avc-table thead th:first-child { text-align: left; }
+  .avc-table tbody td {
     padding: 6px 10px;
     border-top: 1px solid var(--gray-100);
     text-align: right;
     color: var(--gray-700);
     font-variant-numeric: tabular-nums;
   }
-  .avc-breakdown td:first-child { text-align: left; font-weight: 500; }
-  .avc-breakdown tr.breakeven-row td { background: #f0fdf4; font-weight: 700; color: var(--green-700); }
-  .avc-breakdown tr.breakeven-row td:first-child::before { content: "★ "; }
+  .avc-table tbody td:first-child { text-align: left; font-weight: 600; }
+  .avc-table tbody tr.avc-be-row td { background: #f0fdf4; font-weight: 700; color: var(--green-700); }
+  .avc-table .avc-cheaper-buy { color: #16a34a; font-weight: 700; }
+  .avc-table .avc-cheaper-rent { color: #b45309; font-weight: 700; }
+
+  /* ═══ RESPONSIVE GLOBAL ═══════════════════════════════════════════ */
+  /* Cards on mobile */
+  @media (max-width: 640px) {
+    .card-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .bank-card { padding: 14px; }
+    .bank-grid { gap: 12px; }
+    .bank-metrics { gap: 8px; }
+    .roi-kpi-grid { grid-template-columns: 1fr 1fr; }
+    .kpi-card { padding: 12px 10px; }
+    .kpi-val { font-size: 1.1rem; }
+    .ingmin-cards { grid-template-columns: 1fr; }
+    .abono-inputs { grid-template-columns: 1fr; }
+    .phase-card { padding: 10px 12px; }
+    .esc-table-wrap { font-size: 0.72rem; }
+    .action-row { flex-direction: column; gap: 8px; }
+    .action-row .btn { width: 100%; justify-content: center; }
+    .amort-controls { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .amort-view-toggle { width: 100%; }
+    .amort-toggle-btn { flex: 1; text-align: center; }
+    .amort-download-btn { width: 100%; justify-content: center; }
+    .step-divider { gap: 12px; }
+    .step-title { font-size: 1rem; }
+    .step-num { width: 30px; height: 30px; font-size: 0.85rem; flex-shrink: 0; }
+    .hero-stats { gap: 16px; }
+    .stat-num { font-size: 1.4rem; }
+    .hero-content h1 { font-size: 1.6rem; }
+    .main-container { padding: 16px 12px 60px; }
+  }
+  @media (max-width: 400px) {
+    .roi-kpi-grid { grid-template-columns: 1fr; }
+    .avc-kpis { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -3028,7 +3137,178 @@
       </p>
     </div>
   </div>
-  <!-- COMPARADOR DE ESCENARIOS -->
+  
+  <div class="step-sep"></div>
+
+  <!-- STEP 6: ALQUILAR VS COMPRAR -->
+  <div class="step-divider" id="avc-step">
+    <div class="step-num">6</div>
+    <div>
+      <div class="step-title" data-i18n="step6_t">🏠 ¿Alquilar o Comprar?</div>
+      <div class="step-sub" data-i18n="step6_s">Punto de equilibrio · Comparación financiera · ¿En qué año conviene comprar?</div>
+    </div>
+  </div>
+
+  <div class="step-section">
+    <div class="card" id="avc-card">
+      <div class="card-header">
+        <div class="card-icon">⚖️</div>
+        <div>
+          <div class="card-title" data-i18n="avc_title">Simulador: Alquilar vs Comprar</div>
+          <div class="card-subtitle" data-i18n="avc_sub">Descubra en qué año comprar supera financieramente a alquilar</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-intro">
+          <span class="card-intro-icon">ℹ️</span>
+          <span data-i18n="avc_info">Toma la cuota y valor de la propiedad del simulador de arriba. Ajuste el alquiler mensual actual y el horizonte de análisis para ver el punto de equilibrio.</span>
+        </div>
+
+        <!-- Grid de inputs - 3 columnas en desktop, 2 en tablet, 1 en móvil -->
+        <div class="avc-inputs-grid">
+
+          <div class="avc-field">
+            <label class="avc-label">
+              <span data-i18n="avc_lbl_rent">Alquiler mensual</span>
+              <span class="tip" data-tip="¿Cuánto paga o pagaría de alquiler por una propiedad similar? Use el mercado real de la zona." data-tip-key="tip_avc_01">?</span>
+            </label>
+            <div class="input-group">
+              <input type="number" id="avc-rent" min="100000" step="25000" value="500000">
+              <span class="input-unit" id="avc-rent-sym" style="left:10px;right:auto;">₡</span>
+            </div>
+          </div>
+
+          <div class="avc-field">
+            <label class="avc-label">
+              <span data-i18n="avc_lbl_increase">Incremento anual alquiler</span>
+              <span class="tip" data-tip="En CR los contratos permiten ajuste anual. Inflación CR 2022-2026: ~4-6%. Mercado GAM subió 6-8%/año." data-tip-key="tip_avc_02">?</span>
+            </label>
+            <div class="avc-pct-group">
+              <input type="number" id="avc-rent-increase" min="0" max="20" step="0.5" value="5">
+              <span class="avc-unit">%/año</span>
+            </div>
+          </div>
+
+          <div class="avc-field">
+            <label class="avc-label">
+              <span data-i18n="avc_lbl_horizon">Horizonte de análisis</span>
+              <span class="tip" data-tip="¿Cuántos años planea quedarse? Afecta directamente el punto de equilibrio." data-tip-key="tip_avc_04">?</span>
+            </label>
+            <select id="avc-horizon" class="avc-select">
+              <option value="5">5 años</option>
+              <option value="10" selected>10 años</option>
+              <option value="15">15 años</option>
+              <option value="20">20 años</option>
+              <option value="25">25 años</option>
+              <option value="30">30 años</option>
+            </select>
+          </div>
+
+          <div class="avc-field">
+            <label class="avc-label">
+              <span data-i18n="avc_lbl_appreciation">Valorización anual propiedad</span>
+              <span class="tip" data-tip="Apreciación histórica CR (INEC/BN): GAM ~4-6%/año en colones. Zonas turísticas: 6-10%. Rural: 2-3%." data-tip-key="tip_avc_05">?</span>
+            </label>
+            <div class="avc-pct-group">
+              <input type="number" id="avc-appreciation" min="0" max="15" step="0.5" value="4.5">
+              <span class="avc-unit">%/año</span>
+            </div>
+          </div>
+
+          <div class="avc-field">
+            <label class="avc-label">
+              <span data-i18n="avc_lbl_return">Rendimiento alternativo (prima)</span>
+              <span class="tip" data-tip="Si invierte la prima en vez de comprar: CDPs CR 2026 TED ~3%, fondos ~4-6%. Use el rendimiento real que elegiría." data-tip-key="tip_avc_03">?</span>
+            </label>
+            <div class="avc-pct-group">
+              <input type="number" id="avc-invest-return" min="0" max="20" step="0.5" value="4.5">
+              <span class="avc-unit">%/año</span>
+            </div>
+          </div>
+
+          <div class="avc-field">
+            <label class="avc-label">
+              <span data-i18n="avc_lbl_maint">Mantenimiento anual</span>
+              <span class="tip" data-tip="Reparaciones, seguro, impuesto bienes raíces (0.25%), ASADA, etc. Estándar: 1-1.5% del valor por año." data-tip-key="tip_avc_06">?</span>
+            </label>
+            <div class="avc-pct-group">
+              <input type="number" id="avc-maint" min="0" max="5" step="0.1" value="1.2">
+              <span class="avc-unit">% valor</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RESULTADO SIEMPRE VISIBLE - se calcula automáticamente -->
+        <div id="avc-result" style="margin-top:20px;">
+
+          <!-- Veredicto -->
+          <div id="avc-verdict" class="avc-verdict-box">
+            <div class="avc-verdict-icon" id="avc-verdict-icon">⏳</div>
+            <div class="avc-verdict-content">
+              <div class="avc-verdict-title" id="avc-verdict-title" data-i18n="avc_calculating">Calculando...</div>
+              <div class="avc-verdict-sub" id="avc-verdict-sub"></div>
+            </div>
+          </div>
+
+          <!-- 3 KPIs -->
+          <div class="avc-kpis">
+            <div class="avc-kpi">
+              <div class="avc-kpi-label" data-i18n="avc_kpi_breakeven">Punto de equilibrio</div>
+              <div class="avc-kpi-val green" id="avc-kpi-breakeven">—</div>
+              <div class="avc-kpi-sub" data-i18n="avc_kpi_breakeven_sub">Año en que comprar supera alquilar</div>
+            </div>
+            <div class="avc-kpi">
+              <div class="avc-kpi-label" data-i18n="avc_kpi_cost_rent">Costo neto alquilar</div>
+              <div class="avc-kpi-val orange" id="avc-kpi-rent-total">—</div>
+              <div class="avc-kpi-sub" id="avc-kpi-rent-sub">en N años</div>
+            </div>
+            <div class="avc-kpi">
+              <div class="avc-kpi-label" data-i18n="avc_kpi_cost_buy">Costo neto comprar</div>
+              <div class="avc-kpi-val green" id="avc-kpi-buy-total">—</div>
+              <div class="avc-kpi-sub" id="avc-kpi-buy-sub">descontando valorización</div>
+            </div>
+          </div>
+
+          <!-- Gráfico -->
+          <div class="avc-chart-section">
+            <div class="avc-chart-label" data-i18n="avc_timeline_lbl">Costo acumulado año a año (₡)</div>
+            <div style="position:relative;height:220px;">
+              <canvas id="avcChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Tabla año a año (colapsable) -->
+          <details class="avc-details" id="avc-details">
+            <summary class="avc-details-summary">
+              <span data-i18n="avc_breakdown_lbl">Ver desglose año a año</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </summary>
+            <div class="avc-table-wrap">
+              <table class="avc-table" id="avc-table">
+                <thead id="avc-thead"></thead>
+                <tbody id="avc-tbody"></tbody>
+              </table>
+            </div>
+          </details>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-sep"></div>
+
+  <!-- STEP 7: COMPARADOR DE ESCENARIOS -->
+  <div class="step-divider" id="esc-step">
+    <div class="step-num">7</div>
+    <div>
+      <div class="step-title" data-i18n="step7_t">📊 Comparador de escenarios</div>
+      <div class="step-sub" data-i18n="step7_s">Guarda hasta 3 configuraciones y compáralas lado a lado</div>
+    </div>
+  </div>
+
+  <div class="step-section">
+<!-- COMPARADOR DE ESCENARIOS -->
   <div class="card" id="escenarios-card">
     <div class="card-header">
       <div class="card-icon">📊</div>
@@ -3061,134 +3341,10 @@
 
 </div>
 
-  <div class="step-sep"></div>
 
-  <!-- STEP 6: ALQUILAR VS COMPRAR -->
-  <div class="step-header">
-    <div class="step-num">6</div>
-    <div>
-      <div class="step-title" data-i18n="step6_t">🏠 ¿Alquilar o Comprar?</div>
-      <div class="step-sub" data-i18n="step6_s">Punto de equilibrio · Comparación financiera a 10–20 años · ¿En qué año conviene comprar?</div>
-    </div>
   </div>
+</div>
 
-  <div class="card" id="avc-card">
-    <div class="card-icon">🏠</div>
-    <div>
-      <div class="card-title" data-i18n="avc_title">Simulador: Alquilar vs Comprar</div>
-      <div class="card-sub" data-i18n="avc_sub">Compara el costo total de alquilar vs comprar en Costa Rica y descubre en qué año comprar empieza a ser más rentable</div>
-    </div>
-
-    <div class="info-box" style="margin-top:18px;">
-      <span>ℹ️</span>
-      <span data-i18n="avc_info">La calculadora toma el valor de su propiedad y cuota mensual del simulador de arriba. Ajuste el alquiler mensual actual y el horizonte de análisis.</span>
-    </div>
-
-    <!-- Inputs -->
-    <div class="avc-grid">
-      <div class="avc-input-group">
-        <label><span data-i18n="avc_lbl_rent">Alquiler mensual actual</span> <span class="tip" data-tip="¿Cuánto paga o pagaría de alquiler por una propiedad similar a la que piensa comprar? Use el mercado real de la zona." data-tip-key="tip_avc_01">?</span></label>
-        <div class="input-group">
-          <input type="number" id="avc-rent" min="100000" step="50000" value="500000" style="padding:8px 10px 8px 36px;font-size:0.9rem;">
-          <span class="input-unit" id="avc-rent-sym" style="left:10px;right:auto;">₡</span>
-        </div>
-      </div>
-      <div class="avc-input-group">
-        <label><span data-i18n="avc_lbl_increase">Incremento anual del alquiler</span> <span class="tip" data-tip="En Costa Rica los contratos de alquiler permiten ajuste anual. Inflación CR promedio 2022-2026: ~4-6%. El mercado de alquiler GAM ha subido más: 6-8% anual." data-tip-key="tip_avc_02">?</span></label>
-        <div class="input-group" style="align-items:center;display:flex;gap:8px;">
-          <input type="number" id="avc-rent-increase" min="0" max="20" step="0.5" value="5" style="padding:8px 36px 8px 10px;font-size:0.9rem;flex:1;">
-          <span style="color:var(--gray-500);font-size:0.85rem;white-space:nowrap;">% / año</span>
-        </div>
-      </div>
-      <div class="avc-input-group">
-        <label><span data-i18n="avc_lbl_return">Rendimiento inversión alternativa</span> <span class="tip" data-tip="Si en vez de dar la prima la invierte, ¿qué rendimiento obtendría? CDPs bancarios CR 2026: TED ~3%, fondos de mercado: 4-6%. Use el rendimiento real del instrumento que elegiría." data-tip-key="tip_avc_03">?</span></label>
-        <div class="input-group" style="display:flex;gap:8px;align-items:center;">
-          <input type="number" id="avc-invest-return" min="0" max="20" step="0.5" value="4.5" style="padding:8px 36px 8px 10px;font-size:0.9rem;flex:1;">
-          <span style="color:var(--gray-500);font-size:0.85rem;white-space:nowrap;">% / año</span>
-        </div>
-      </div>
-      <div class="avc-input-group">
-        <label><span data-i18n="avc_lbl_horizon">Horizonte de análisis</span> <span class="tip" data-tip="¿Cuántos años piensa quedarse en la propiedad? Impacta directamente el punto de equilibrio. A más años, más favorece comprar." data-tip-key="tip_avc_04">?</span></label>
-        <select id="avc-horizon" style="width:100%;padding:8px 10px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;">
-          <option value="5">5 años</option>
-          <option value="10" selected>10 años</option>
-          <option value="15">15 años</option>
-          <option value="20">20 años</option>
-          <option value="25">25 años</option>
-          <option value="30">30 años</option>
-        </select>
-      </div>
-      <div class="avc-input-group">
-        <label><span data-i18n="avc_lbl_appreciation">Valorización anual esperada</span> <span class="tip" data-tip="Apreciación histórica de propiedades en CR (INEC/BN): GAM promedio ~4-6% anual en colones. Zonas turísticas: 6-10%. Rural: 2-3%." data-tip-key="tip_avc_05">?</span></label>
-        <div class="input-group" style="display:flex;gap:8px;align-items:center;">
-          <input type="number" id="avc-appreciation" min="0" max="15" step="0.5" value="4.5" style="padding:8px 36px 8px 10px;font-size:0.9rem;flex:1;">
-          <span style="color:var(--gray-500);font-size:0.85rem;white-space:nowrap;">% / año</span>
-        </div>
-      </div>
-      <div class="avc-input-group">
-        <label><span data-i18n="avc_lbl_maint">Gastos de mantenimiento anuales</span> <span class="tip" data-tip="Mantenimiento, reparaciones, seguro, impuesto de bienes raíces (0.25% del valor). Estándar: 1-1.5% del valor de la propiedad por año." data-tip-key="tip_avc_06">?</span></label>
-        <div class="input-group" style="display:flex;gap:8px;align-items:center;">
-          <input type="number" id="avc-maint" min="0" max="5" step="0.1" value="1.2" style="padding:8px 36px 8px 10px;font-size:0.9rem;flex:1;">
-          <span style="color:var(--gray-500);font-size:0.85rem;white-space:nowrap;">% del valor</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Botón calcular -->
-    <div style="text-align:center;margin:20px 0 4px;">
-      <button class="btn btn-primary" onclick="calcularAVC()" id="avc-calc-btn" style="font-size:0.95rem;padding:12px 32px;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-        <span data-i18n="avc_btn_calc">Calcular comparación</span>
-      </button>
-    </div>
-
-    <!-- Resultado -->
-    <div id="avc-result" style="display:none;margin-top:20px;">
-
-      <!-- Veredicto -->
-      <div id="avc-verdict" class="avc-verdict-box">
-        <div style="font-size:2rem;" id="avc-verdict-icon">⏳</div>
-        <div>
-          <div class="avc-verdict-title" id="avc-verdict-title">Calculando...</div>
-          <div class="avc-verdict-sub" id="avc-verdict-sub"></div>
-        </div>
-      </div>
-
-      <!-- KPIs en 3 columnas -->
-      <div class="avc-kpi-row">
-        <div class="avc-kpi">
-          <div class="avc-kpi-label" data-i18n="avc_kpi_breakeven">Punto de equilibrio</div>
-          <div class="avc-kpi-val" id="avc-kpi-breakeven">—</div>
-          <div class="avc-kpi-sub" data-i18n="avc_kpi_breakeven_sub">Año en que comprar supera alquilar</div>
-        </div>
-        <div class="avc-kpi">
-          <div class="avc-kpi-label" data-i18n="avc_kpi_cost_rent">Costo total alquilar</div>
-          <div class="avc-kpi-val" id="avc-kpi-rent-total">—</div>
-          <div class="avc-kpi-sub" id="avc-kpi-rent-sub">en N años</div>
-        </div>
-        <div class="avc-kpi">
-          <div class="avc-kpi-label" data-i18n="avc_kpi_cost_buy">Costo neto comprar</div>
-          <div class="avc-kpi-val" id="avc-kpi-buy-total">—</div>
-          <div class="avc-kpi-sub" id="avc-kpi-buy-sub">descontando valorización</div>
-        </div>
-      </div>
-
-      <!-- Timeline visual año por año -->
-      <div style="margin-top:16px;">
-        <div style="font-size:0.78rem;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;" data-i18n="avc_timeline_lbl">Diferencia acumulada año a año (negativo = comprar es más barato)</div>
-        <div id="avc-chart-wrap" style="overflow-x:auto;">
-          <canvas id="avcChart" height="200"></canvas>
-        </div>
-      </div>
-
-      <!-- Desglose detallado -->
-      <details style="margin-top:16px;">
-        <summary style="cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--green-700);padding:8px 0;" data-i18n="avc_breakdown_lbl">Ver desglose detallado</summary>
-        <div class="avc-breakdown" id="avc-breakdown"></div>
-      </details>
-
-    </div>
-  </div>
 
 <!-- FOOTER -->
 <footer>
@@ -3257,6 +3413,12 @@
       setTimeout(forceAllCharts, 150);
       setTimeout(forceAllCharts, 500);
     });
+    // Recalculate AVC after render (lastCalc may have updated)
+    setTimeout(function() {
+      if (typeof calcularAVC === 'function') {
+        try { calcularAVC(); } catch(e) {}
+      }
+    }, 600);
   }
 
   window.addEventListener('load', function () {
@@ -3304,7 +3466,10 @@
       avc_kpi_cost_buy: 'Costo neto comprar',
       avc_timeline_lbl: 'Diferencia acumulada a\u00f1o a a\u00f1o',
       avc_breakdown_lbl: 'Ver desglose detallado',
-      btn_whatsapp: 'Compartir por WhatsApp'
+      btn_whatsapp: 'Compartir por WhatsApp',
+      step7_t: '📊 Comparador de escenarios',
+      step7_s: 'Guarda hasta 3 configuraciones y compáralas lado a lado',
+      avc_calculating: 'Calculando...'
     },
     en: {
       footer_disclaimer: 'Actual costs vary by design, contractor, region, and market conditions. <strong>Always consult a CFIA-registered professional.</strong> This does not constitute financial advice.',
@@ -3328,7 +3493,10 @@
       avc_kpi_cost_buy: 'Net cost to buy',
       avc_timeline_lbl: 'Cumulative difference year by year',
       avc_breakdown_lbl: 'View detailed breakdown',
-      btn_whatsapp: 'Share via WhatsApp'
+      btn_whatsapp: 'Share via WhatsApp',
+      step7_t: '📊 Scenario Comparator',
+      step7_s: 'Save up to 3 configurations and compare them side by side',
+      avc_calculating: 'Calculating...'
     }
   };
 
@@ -3715,7 +3883,48 @@
         '</tr>';
     }
     breakHtml += '</tbody></table>';
-    document.getElementById('avc-breakdown').innerHTML = breakHtml;
+    var tableEl = document.getElementById('avc-table');
+    if (tableEl) {
+      // Use thead/tbody from new table structure
+      var theadHtml = '<tr><th>' +
+        (lang === 'en' ? 'Year' : 'Año') + '</th><th>' +
+        (lang === 'en' ? 'Rent/yr' : 'Alquiler/año') + '</th><th>' +
+        (lang === 'en' ? 'Rent Net Cum.' : 'Alquiler Acum.') + '</th><th>' +
+        (lang === 'en' ? 'Buy/yr' : 'Compra/año') + '</th><th>' +
+        (lang === 'en' ? 'Buy Net Cum.' : 'Compra Acum.') + '</th><th>' +
+        (lang === 'en' ? 'Difference' : 'Diferencia') + '</th></tr>';
+      var theadEl = document.getElementById('avc-thead');
+      var tbodyEl = document.getElementById('avc-tbody');
+      if (theadEl) theadEl.innerHTML = theadHtml;
+      if (tbodyEl) {
+        // rebuild rows
+        var rentR2 = 0, buyR2 = gastosFormal, prI2 = prima, rentMo2 = rentMensual, pvB = propValue;
+        var tbodyHtml = '';
+        for (var yr = 1; yr <= horizon; yr++) {
+          var aRent = rentMo2 * 12;
+          rentR2 += aRent;
+          prI2 *= (1 + investReturn);
+          rentMo2 *= (1 + rentIncrease);
+          var rNet2 = rentR2 - (prI2 - prima);
+          var aBuy = cuotaMensual * 12 + pvB * maintPct;
+          buyR2 += aBuy;
+          pvB *= (1 + appreciation);
+          var bNet2 = buyR2 - (pvB - propValue);
+          var diff = bNet2 - rNet2;
+          var isBE = breakeven === yr;
+          tbodyHtml += '<tr' + (isBE ? ' class="avc-be-row"' : '') + '>' +
+            '<td>' + (lang === 'en' ? 'Year ' : 'Año ') + yr + '</td>' +
+            '<td>' + fmt(aRent) + '</td>' +
+            '<td>' + fmt(rNet2) + '</td>' +
+            '<td>' + fmt(aBuy) + '</td>' +
+            '<td>' + fmt(bNet2) + '</td>' +
+            '<td class="' + (diff < 0 ? 'avc-cheaper-buy' : 'avc-cheaper-rent') + '">' +
+              (diff < 0 ? '▼ ' : '▲ ') + fmt(Math.abs(diff)) + '</td>' +
+            '</tr>';
+        }
+        tbodyEl.innerHTML = tbodyHtml;
+      }
+    }
 
     // GA4 event
     if (typeof window._gaEvent === 'function') {
@@ -3730,6 +3939,23 @@
 
   // ── GA4: track key user interactions ──────────────────────────────────────
   window.addEventListener('load', function() {
+    // Auto-trigger AVC calculation when inputs change
+    var avcInputIds = ['avc-rent','avc-rent-increase','avc-invest-return',
+                       'avc-horizon','avc-appreciation','avc-maint'];
+    avcInputIds.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', function() {
+          clearTimeout(window._avcDebounce);
+          window._avcDebounce = setTimeout(calcularAVC, 300);
+        });
+        el.addEventListener('change', function() {
+          clearTimeout(window._avcDebounce);
+          window._avcDebounce = setTimeout(calcularAVC, 100);
+        });
+      }
+    });
+
     // Track when user reaches key sections (scroll-based)
     if ('IntersectionObserver' in window && typeof window._gaEvent === 'function') {
       var sections = [
