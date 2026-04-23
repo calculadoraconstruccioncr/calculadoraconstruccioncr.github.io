@@ -1,6 +1,26 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-K5Q017N73Q"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-K5Q017N73Q');
+
+  // Eventos personalizados para rastreo de funciones clave
+  window._gaEvent = function(action, category, label, value) {
+    if (typeof gtag === 'function') {
+      gtag('event', action, {
+        event_category: category,
+        event_label: label,
+        value: value
+      });
+    }
+  };
+</script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5515541580647235"
      crossorigin="anonymous"></script>
 <meta charset="UTF-8">
@@ -1391,6 +1411,83 @@
   #abono-monto-unit { left: 10px; right: auto; }
   #abono-monto { padding-left: 28px; padding-right: 6px; }
 
+
+  /* ── Alquilar vs Comprar ─────────────────────────────────────────── */
+  .avc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 20px;
+  }
+  @media (max-width: 600px) { .avc-grid { grid-template-columns: 1fr; } }
+  .avc-input-group label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    margin-bottom: 5px;
+  }
+  .avc-verdict-box {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    margin-bottom: 16px;
+    background: var(--gray-50);
+    border-color: var(--gray-200);
+  }
+  .avc-verdict-box.buy  { background: #f0fdf4; border-color: #86efac; }
+  .avc-verdict-box.rent { background: #fef9c3; border-color: #fde047; }
+  .avc-verdict-box.tie  { background: #f0f9ff; border-color: #7dd3fc; }
+  .avc-verdict-title { font-size: 1rem; font-weight: 700; color: var(--gray-900); }
+  .avc-verdict-sub   { font-size: 0.82rem; color: var(--gray-600); margin-top: 3px; }
+  .avc-kpi-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 4px;
+  }
+  @media (max-width: 600px) { .avc-kpi-row { grid-template-columns: 1fr; } }
+  .avc-kpi {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+  .avc-kpi-label { font-size: 0.72rem; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: .04em; }
+  .avc-kpi-val   { font-size: 1.25rem; font-weight: 800; color: var(--green-700); margin: 6px 0 4px; }
+  .avc-kpi-sub   { font-size: 0.72rem; color: var(--gray-400); }
+  .avc-breakdown {
+    margin-top: 12px;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 0.8rem;
+  }
+  .avc-breakdown table { width: 100%; border-collapse: collapse; }
+  .avc-breakdown th {
+    background: var(--gray-100);
+    padding: 7px 10px;
+    text-align: right;
+    font-weight: 600;
+    color: var(--gray-700);
+    font-size: 0.73rem;
+    white-space: nowrap;
+  }
+  .avc-breakdown th:first-child { text-align: left; }
+  .avc-breakdown td {
+    padding: 6px 10px;
+    border-top: 1px solid var(--gray-100);
+    text-align: right;
+    color: var(--gray-700);
+    font-variant-numeric: tabular-nums;
+  }
+  .avc-breakdown td:first-child { text-align: left; font-weight: 500; }
+  .avc-breakdown tr.breakeven-row td { background: #f0fdf4; font-weight: 700; color: var(--green-700); }
+  .avc-breakdown tr.breakeven-row td:first-child::before { content: "★ "; }
 </style>
 </head>
 <body>
@@ -2257,6 +2354,11 @@
               <span data-i18n="btn_pdf">Exportar PDF</span>
             </button>
 
+            <button class="btn btn-outline" onclick="compartirWhatsApp()" style="background:#25D366;color:#fff;border-color:#25D366;" id="btn-whatsapp">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.012.49 3.912 1.36 5.591L0 24l6.617-1.337A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.652-.513-5.17-1.406L3.6 21.4l.826-3.127A9.956 9.956 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+              <span data-i18n="btn_whatsapp">Compartir por WhatsApp</span>
+            </button>
+
             <button id="btn-reset" class="btn btn-outline" onclick="resetDefaults()" style="color:#6b7280;">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.49"/></svg>
               <span data-i18n="btn_reset">Restablecer</span>
@@ -2959,6 +3061,135 @@
 
 </div>
 
+  <div class="step-sep"></div>
+
+  <!-- STEP 6: ALQUILAR VS COMPRAR -->
+  <div class="step-header">
+    <div class="step-num">6</div>
+    <div>
+      <div class="step-title" data-i18n="step6_t">🏠 ¿Alquilar o Comprar?</div>
+      <div class="step-sub" data-i18n="step6_s">Punto de equilibrio · Comparación financiera a 10–20 años · ¿En qué año conviene comprar?</div>
+    </div>
+  </div>
+
+  <div class="card" id="avc-card">
+    <div class="card-icon">🏠</div>
+    <div>
+      <div class="card-title" data-i18n="avc_title">Simulador: Alquilar vs Comprar</div>
+      <div class="card-sub" data-i18n="avc_sub">Compara el costo total de alquilar vs comprar en Costa Rica y descubre en qué año comprar empieza a ser más rentable</div>
+    </div>
+
+    <div class="info-box" style="margin-top:18px;">
+      <span>ℹ️</span>
+      <span data-i18n="avc_info">La calculadora toma el valor de su propiedad y cuota mensual del simulador de arriba. Ajuste el alquiler mensual actual y el horizonte de análisis.</span>
+    </div>
+
+    <!-- Inputs -->
+    <div class="avc-grid">
+      <div class="avc-input-group">
+        <label><span data-i18n="avc_lbl_rent">Alquiler mensual actual</span> <span class="tip" data-tip="¿Cuánto paga o pagaría de alquiler por una propiedad similar a la que piensa comprar? Use el mercado real de la zona." data-tip-key="tip_avc_01">?</span></label>
+        <div class="input-group">
+          <input type="number" id="avc-rent" min="100000" step="50000" value="500000" style="padding:8px 10px 8px 36px;font-size:0.9rem;">
+          <span class="input-unit" id="avc-rent-sym" style="left:10px;right:auto;">₡</span>
+        </div>
+      </div>
+      <div class="avc-input-group">
+        <label><span data-i18n="avc_lbl_increase">Incremento anual del alquiler</span> <span class="tip" data-tip="En Costa Rica los contratos de alquiler permiten ajuste anual. Inflación CR promedio 2022-2026: ~4-6%. El mercado de alquiler GAM ha subido más: 6-8% anual." data-tip-key="tip_avc_02">?</span></label>
+        <div class="input-group" style="align-items:center;display:flex;gap:8px;">
+          <input type="number" id="avc-rent-increase" min="0" max="20" step="0.5" value="5" style="padding:8px 36px 8px 10px;font-size:0.9rem;flex:1;">
+          <span style="color:var(--gray-500);font-size:0.85rem;white-space:nowrap;">% / año</span>
+        </div>
+      </div>
+      <div class="avc-input-group">
+        <label><span data-i18n="avc_lbl_return">Rendimiento inversión alternativa</span> <span class="tip" data-tip="Si en vez de dar la prima la invierte, ¿qué rendimiento obtendría? CDPs bancarios CR 2026: TED ~3%, fondos de mercado: 4-6%. Use el rendimiento real del instrumento que elegiría." data-tip-key="tip_avc_03">?</span></label>
+        <div class="input-group" style="display:flex;gap:8px;align-items:center;">
+          <input type="number" id="avc-invest-return" min="0" max="20" step="0.5" value="4.5" style="padding:8px 36px 8px 10px;font-size:0.9rem;flex:1;">
+          <span style="color:var(--gray-500);font-size:0.85rem;white-space:nowrap;">% / año</span>
+        </div>
+      </div>
+      <div class="avc-input-group">
+        <label><span data-i18n="avc_lbl_horizon">Horizonte de análisis</span> <span class="tip" data-tip="¿Cuántos años piensa quedarse en la propiedad? Impacta directamente el punto de equilibrio. A más años, más favorece comprar." data-tip-key="tip_avc_04">?</span></label>
+        <select id="avc-horizon" style="width:100%;padding:8px 10px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;">
+          <option value="5">5 años</option>
+          <option value="10" selected>10 años</option>
+          <option value="15">15 años</option>
+          <option value="20">20 años</option>
+          <option value="25">25 años</option>
+          <option value="30">30 años</option>
+        </select>
+      </div>
+      <div class="avc-input-group">
+        <label><span data-i18n="avc_lbl_appreciation">Valorización anual esperada</span> <span class="tip" data-tip="Apreciación histórica de propiedades en CR (INEC/BN): GAM promedio ~4-6% anual en colones. Zonas turísticas: 6-10%. Rural: 2-3%." data-tip-key="tip_avc_05">?</span></label>
+        <div class="input-group" style="display:flex;gap:8px;align-items:center;">
+          <input type="number" id="avc-appreciation" min="0" max="15" step="0.5" value="4.5" style="padding:8px 36px 8px 10px;font-size:0.9rem;flex:1;">
+          <span style="color:var(--gray-500);font-size:0.85rem;white-space:nowrap;">% / año</span>
+        </div>
+      </div>
+      <div class="avc-input-group">
+        <label><span data-i18n="avc_lbl_maint">Gastos de mantenimiento anuales</span> <span class="tip" data-tip="Mantenimiento, reparaciones, seguro, impuesto de bienes raíces (0.25% del valor). Estándar: 1-1.5% del valor de la propiedad por año." data-tip-key="tip_avc_06">?</span></label>
+        <div class="input-group" style="display:flex;gap:8px;align-items:center;">
+          <input type="number" id="avc-maint" min="0" max="5" step="0.1" value="1.2" style="padding:8px 36px 8px 10px;font-size:0.9rem;flex:1;">
+          <span style="color:var(--gray-500);font-size:0.85rem;white-space:nowrap;">% del valor</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botón calcular -->
+    <div style="text-align:center;margin:20px 0 4px;">
+      <button class="btn btn-primary" onclick="calcularAVC()" id="avc-calc-btn" style="font-size:0.95rem;padding:12px 32px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        <span data-i18n="avc_btn_calc">Calcular comparación</span>
+      </button>
+    </div>
+
+    <!-- Resultado -->
+    <div id="avc-result" style="display:none;margin-top:20px;">
+
+      <!-- Veredicto -->
+      <div id="avc-verdict" class="avc-verdict-box">
+        <div style="font-size:2rem;" id="avc-verdict-icon">⏳</div>
+        <div>
+          <div class="avc-verdict-title" id="avc-verdict-title">Calculando...</div>
+          <div class="avc-verdict-sub" id="avc-verdict-sub"></div>
+        </div>
+      </div>
+
+      <!-- KPIs en 3 columnas -->
+      <div class="avc-kpi-row">
+        <div class="avc-kpi">
+          <div class="avc-kpi-label" data-i18n="avc_kpi_breakeven">Punto de equilibrio</div>
+          <div class="avc-kpi-val" id="avc-kpi-breakeven">—</div>
+          <div class="avc-kpi-sub" data-i18n="avc_kpi_breakeven_sub">Año en que comprar supera alquilar</div>
+        </div>
+        <div class="avc-kpi">
+          <div class="avc-kpi-label" data-i18n="avc_kpi_cost_rent">Costo total alquilar</div>
+          <div class="avc-kpi-val" id="avc-kpi-rent-total">—</div>
+          <div class="avc-kpi-sub" id="avc-kpi-rent-sub">en N años</div>
+        </div>
+        <div class="avc-kpi">
+          <div class="avc-kpi-label" data-i18n="avc_kpi_cost_buy">Costo neto comprar</div>
+          <div class="avc-kpi-val" id="avc-kpi-buy-total">—</div>
+          <div class="avc-kpi-sub" id="avc-kpi-buy-sub">descontando valorización</div>
+        </div>
+      </div>
+
+      <!-- Timeline visual año por año -->
+      <div style="margin-top:16px;">
+        <div style="font-size:0.78rem;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;" data-i18n="avc_timeline_lbl">Diferencia acumulada año a año (negativo = comprar es más barato)</div>
+        <div id="avc-chart-wrap" style="overflow-x:auto;">
+          <canvas id="avcChart" height="200"></canvas>
+        </div>
+      </div>
+
+      <!-- Desglose detallado -->
+      <details style="margin-top:16px;">
+        <summary style="cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--green-700);padding:8px 0;" data-i18n="avc_breakdown_lbl">Ver desglose detallado</summary>
+        <div class="avc-breakdown" id="avc-breakdown"></div>
+      </details>
+
+    </div>
+  </div>
+
 <!-- FOOTER -->
 <footer>
   <p data-i18n="footer1">Calculadora de Construcción <strong>Costa Rica</strong> · Estimaciones de referencia actualizadas abril 2026 (BCCR, CICSA, CFIA).</p>
@@ -3052,22 +3283,62 @@
 
   var footerT = {
     es: {
-      'footer_disclaimer': 'Los costos reales varían por diseño, proveedor, zona y condiciones de mercado. <strong>Consulte siempre con un profesional inscrito en el CFIA.</strong> No constituye asesoría financiera.',
-      'footer_privacy': 'Política de Privacidad',
-      'footer_cookies': 'Cookies'
+      footer_disclaimer: 'Los costos reales var\u00edan por dise\u00f1o, proveedor, zona y condiciones de mercado. <strong>Consulte siempre con un profesional inscrito en el CFIA.</strong> No constituye asesor\u00eda financiera.',
+      footer_privacy: 'Pol\u00edtica de Privacidad',
+      footer_cookies: 'Cookies',
+      step6_t: '\uD83C\uDFE0 \u00bfAlquilar o Comprar?',
+      step6_s: 'Punto de equilibrio \u00b7 Comparaci\u00f3n financiera a 10\u201320 a\u00f1os \u00b7 \u00bfEn qu\u00e9 a\u00f1o conviene comprar?',
+      avc_title: 'Simulador: Alquilar vs Comprar',
+      avc_sub: 'Compara el costo total de alquilar vs comprar en Costa Rica y descubre en qu\u00e9 a\u00f1o comprar empieza a ser m\u00e1s rentable',
+      avc_info: 'La calculadora toma el valor de su propiedad y cuota mensual del simulador de arriba. Ajuste el alquiler mensual actual y el horizonte de an\u00e1lisis.',
+      avc_lbl_rent: 'Alquiler mensual actual',
+      avc_lbl_increase: 'Incremento anual del alquiler',
+      avc_lbl_return: 'Rendimiento inversi\u00f3n alternativa',
+      avc_lbl_horizon: 'Horizonte de an\u00e1lisis',
+      avc_lbl_appreciation: 'Valorizaci\u00f3n anual esperada',
+      avc_lbl_maint: 'Gastos de mantenimiento anuales',
+      avc_btn_calc: 'Calcular comparaci\u00f3n',
+      avc_kpi_breakeven: 'Punto de equilibrio',
+      avc_kpi_breakeven_sub: 'A\u00f1o en que comprar supera alquilar',
+      avc_kpi_cost_rent: 'Costo total alquilar',
+      avc_kpi_cost_buy: 'Costo neto comprar',
+      avc_timeline_lbl: 'Diferencia acumulada a\u00f1o a a\u00f1o',
+      avc_breakdown_lbl: 'Ver desglose detallado',
+      btn_whatsapp: 'Compartir por WhatsApp'
     },
     en: {
-      'footer_disclaimer': 'Actual costs vary by design, contractor, region, and market conditions. <strong>Always consult a CFIA-registered professional.</strong> This does not constitute financial advice.',
-      'footer_privacy': 'Privacy Policy',
-      'footer_cookies': 'Cookies'
+      footer_disclaimer: 'Actual costs vary by design, contractor, region, and market conditions. <strong>Always consult a CFIA-registered professional.</strong> This does not constitute financial advice.',
+      footer_privacy: 'Privacy Policy',
+      footer_cookies: 'Cookies',
+      step6_t: '\uD83C\uDFE0 Rent or Buy?',
+      step6_s: 'Break-even point \u00b7 Financial comparison over 10\u201320 years \u00b7 Which year does buying make sense?',
+      avc_title: 'Simulator: Rent vs Buy',
+      avc_sub: 'Compare the total cost of renting vs buying in Costa Rica and find out which year buying becomes more profitable',
+      avc_info: 'The calculator uses your property value and monthly payment from the simulator above. Adjust the current monthly rent and analysis horizon.',
+      avc_lbl_rent: 'Current monthly rent',
+      avc_lbl_increase: 'Annual rent increase',
+      avc_lbl_return: 'Alternative investment return',
+      avc_lbl_horizon: 'Analysis horizon',
+      avc_lbl_appreciation: 'Expected annual appreciation',
+      avc_lbl_maint: 'Annual maintenance costs',
+      avc_btn_calc: 'Calculate comparison',
+      avc_kpi_breakeven: 'Break-even point',
+      avc_kpi_breakeven_sub: 'Year when buying surpasses renting',
+      avc_kpi_cost_rent: 'Total cost to rent',
+      avc_kpi_cost_buy: 'Net cost to buy',
+      avc_timeline_lbl: 'Cumulative difference year by year',
+      avc_breakdown_lbl: 'View detailed breakdown',
+      btn_whatsapp: 'Share via WhatsApp'
     }
   };
 
   function applyFooterLang(lang) {
     var t = footerT[lang] || footerT.es;
     Object.keys(t).forEach(function(key) {
-      var el = document.querySelector('[data-i18n="' + key + '"]');
-      if (el) el.innerHTML = t[key];
+      // Skip comment keys
+      if (key.startsWith('//')) return;
+      var els = document.querySelectorAll('[data-i18n="' + key + '"]');
+      els.forEach(function(el) { el.innerHTML = t[key]; });
     });
   }
 
@@ -3143,6 +3414,345 @@
   window.addEventListener('DOMContentLoaded', function () {
     var ov = document.getElementById('rates-overlay');
     if (ov) ov.remove();
+  });
+
+
+  // ── compartirWhatsApp() ────────────────────────────────────────────────────
+  window.compartirWhatsApp = function() {
+    try {
+      // Build URL with current calculator state
+      var params = new URLSearchParams();
+      var s = (typeof state !== 'undefined') ? state : {};
+      if (s.area) params.set('area', s.area);
+      if (s.acabado) params.set('acabado', s.acabado);
+      if (s.sistema) params.set('sistema', s.sistema);
+      if (s.zona) params.set('ubicacion', s.zona);
+      if (s.prima) params.set('prima', s.prima);
+      if (s.plazo) params.set('plazo', s.plazo);
+      if (s.tasaFija) params.set('tasaFija', s.tasaFija);
+      if (s.loanMoneda) params.set('loanMoneda', s.loanMoneda);
+      if (s.moneda) params.set('moneda', s.moneda);
+      if (s.tipoCambio) params.set('tc', s.tipoCambio);
+
+      var baseUrl = window.location.href.split('?')[0];
+      var shareUrl = baseUrl + '?' + params.toString();
+
+      // Get current totals for the message
+      var calc = (typeof lastCalc !== 'undefined' && lastCalc) ? lastCalc : null;
+      var totalText = '';
+      if (calc) {
+        var t = calc.total || calc.totalConstruccion || 0;
+        if (t > 0) {
+          totalText = ' — Total estimado: ₡' + Math.round(t).toLocaleString('es-CR');
+        }
+      }
+
+      var lang = (typeof state !== 'undefined' && state.lang === 'en') ? 'en' : 'es';
+      var msg = lang === 'en'
+        ? 'I calculated the cost to build my home in Costa Rica' + totalText + '. Check out the numbers: ' + shareUrl
+        : 'Calculé el costo de construir mi casa en Costa Rica' + totalText + '. Mirá los números: ' + shareUrl;
+
+      var waUrl = 'https://wa.me/?text=' + encodeURIComponent(msg);
+      window.open(waUrl, '_blank', 'noopener,noreferrer');
+
+      // GA4 event
+      if (typeof window._gaEvent === 'function') {
+        window._gaEvent('share', 'engagement', 'whatsapp', Math.round((calc && calc.total) || 0));
+      }
+    } catch(e) { console.warn('WhatsApp share error:', e); }
+  };
+
+  // ── calcularAVC() — Alquilar vs Comprar ───────────────────────────────────
+  window.calcularAVC = function() {
+    var lang = (typeof state !== 'undefined' && state.lang === 'en') ? 'en' : 'es';
+    var fmt = function(n) {
+      return '₡ ' + Math.round(Math.abs(n)).toLocaleString('es-CR');
+    };
+
+    // Get inputs
+    var rentMensual = parseFloat(document.getElementById('avc-rent').value) || 500000;
+    var rentIncrease = parseFloat(document.getElementById('avc-rent-increase').value) / 100 || 0.05;
+    var investReturn = parseFloat(document.getElementById('avc-invest-return').value) / 100 || 0.045;
+    var horizon = parseInt(document.getElementById('avc-horizon').value) || 10;
+    var appreciation = parseFloat(document.getElementById('avc-appreciation').value) / 100 || 0.045;
+    var maintPct = parseFloat(document.getElementById('avc-maint').value) / 100 || 0.012;
+
+    // Get from current calculation
+    var calc = (typeof lastCalc !== 'undefined' && lastCalc) ? lastCalc : null;
+    var propValue = calc ? (calc.valorPropiedad || calc.totalConstruccion || 0) : 0;
+    var prima = calc ? (calc.primaVal || 0) : 0;
+    var cuotaMensual = calc ? (calc.cuotaTotalFija || calc.cuota || 0) : 0;
+    var montoPrestamo = calc ? (calc.montoPrestamo || 0) : 0;
+    var gastosFormal = calc ? (calc.gastosFormalizacion || 0) : 0;
+
+    if (propValue === 0) {
+      // Use defaults if no calculation done
+      propValue = 60000000;
+      prima = propValue * 0.20;
+      cuotaMensual = 450000;
+      montoPrestamo = propValue * 0.80;
+      gastosFormal = propValue * 0.025;
+    }
+
+    // ── SCENARIO: RENT ─────────────────────────────────────────────────────
+    // Year by year: cumulative rent paid + opportunity cost of not investing prima
+    var rentYearly = [];
+    var cumRent = 0;
+    var primaInvested = prima; // if renting, you invest the prima
+    var rentMonthly = rentMensual;
+
+    for (var y = 1; y <= horizon; y++) {
+      cumRent += rentMonthly * 12;
+      primaInvested *= (1 + investReturn); // prima grows
+      rentYearly.push({ year: y, cumRent: cumRent, primaValue: primaInvested });
+      rentMonthly *= (1 + rentIncrease);
+    }
+
+    // Total cost of renting: cumulative rent MINUS the gain from investing prima
+    var primaGain = primaInvested - prima; // gain on invested prima
+    var rentNetCost = cumRent - primaGain;
+
+    // ── SCENARIO: BUY ──────────────────────────────────────────────────────
+    // Year by year: cumulative mortgage + maint + forma - property appreciation
+    var buyYearly = [];
+    var cumBuy = gastosFormal; // upfront costs
+    var propVal = propValue;
+
+    for (var y = 1; y <= horizon; y++) {
+      cumBuy += cuotaMensual * 12;
+      cumBuy += propVal * maintPct; // maintenance grows with property value
+      propVal *= (1 + appreciation);
+      var equity = propVal - montoPrestamo * (1 - y / (typeof state !== 'undefined' && state.plazo ? state.plazo : 30));
+      buyYearly.push({ year: y, cumBuy: cumBuy, propValue: propVal, equity: Math.max(0, equity) });
+    }
+
+    // Net buy cost = total paid - property appreciation gain
+    var propGain = propVal - propValue;
+    var buyNetCost = cumBuy - propGain;
+
+    // ── BREAKEVEN ──────────────────────────────────────────────────────────
+    // Find year where cumulative cost of buying < cost of renting (considering appreciation)
+    var breakeven = null;
+    var rentRunning = 0;
+    var buyRunning = gastosFormal;
+    var prInv = prima;
+    var rentM = rentMensual;
+    var pv = propValue;
+
+    for (var y = 1; y <= 35; y++) {
+      rentRunning += rentM * 12;
+      prInv *= (1 + investReturn);
+      rentM *= (1 + rentIncrease);
+      var rentNet = rentRunning - (prInv - prima);
+
+      buyRunning += cuotaMensual * 12 + pv * maintPct;
+      pv *= (1 + appreciation);
+      var buyNet = buyRunning - (pv - propValue);
+
+      if (buyNet < rentNet && breakeven === null) {
+        breakeven = y;
+        break;
+      }
+    }
+
+    // ── SHOW RESULTS ───────────────────────────────────────────────────────
+    document.getElementById('avc-result').style.display = 'block';
+
+    // Verdict
+    var verdictBox = document.getElementById('avc-verdict');
+    var verdictIcon = document.getElementById('avc-verdict-icon');
+    var verdictTitle = document.getElementById('avc-verdict-title');
+    var verdictSub = document.getElementById('avc-verdict-sub');
+    verdictBox.className = 'avc-verdict-box';
+
+    if (breakeven === null) {
+      verdictBox.classList.add('rent');
+      verdictIcon.textContent = '🏠';
+      verdictTitle.textContent = lang === 'en'
+        ? 'Renting is more advantageous in ' + horizon + ' years'
+        : 'Alquilar es más conveniente en ' + horizon + ' años';
+      verdictSub.textContent = lang === 'en'
+        ? 'With these parameters, break-even is beyond ' + horizon + ' years. Consider longer horizon or higher appreciation.'
+        : 'Con estos parámetros, el punto de equilibrio supera los ' + horizon + ' años. Considere un horizonte mayor o mayor valorización.';
+    } else if (breakeven <= Math.round(horizon * 0.4)) {
+      verdictBox.classList.add('buy');
+      verdictIcon.textContent = '✅';
+      verdictTitle.textContent = lang === 'en'
+        ? 'Buying is clearly better — break-even at year ' + breakeven
+        : 'Comprar es claramente mejor — punto de equilibrio en el año ' + breakeven;
+      verdictSub.textContent = lang === 'en'
+        ? 'After year ' + breakeven + ', buying generates net savings vs renting.'
+        : 'A partir del año ' + breakeven + ', comprar genera ahorro neto vs alquilar.';
+    } else {
+      verdictBox.classList.add('tie');
+      verdictIcon.textContent = '⚖️';
+      verdictTitle.textContent = lang === 'en'
+        ? 'Break-even at year ' + breakeven + ' — depends on your plans'
+        : 'Punto de equilibrio en el año ' + breakeven + ' — depende de sus planes';
+      verdictSub.textContent = lang === 'en'
+        ? 'If you plan to stay more than ' + breakeven + ' years, buying is better. Less: renting is better.'
+        : 'Si planea quedarse más de ' + breakeven + ' años, comprar es mejor. Menos: alquilar conviene.';
+    }
+
+    // KPIs
+    document.getElementById('avc-kpi-breakeven').textContent =
+      breakeven ? (lang === 'en' ? 'Year ' : 'Año ') + breakeven : (lang === 'en' ? '> ' + horizon + ' yr' : '> ' + horizon + ' años');
+    document.getElementById('avc-kpi-rent-total').textContent = fmt(rentNetCost);
+    document.getElementById('avc-kpi-rent-sub').textContent =
+      (lang === 'en' ? 'in ' : 'en ') + horizon + (lang === 'en' ? ' years (rent - prima gains)' : ' años (alquiler − ganancia prima)');
+    document.getElementById('avc-kpi-buy-total').textContent = fmt(buyNetCost);
+    document.getElementById('avc-kpi-buy-sub').textContent =
+      lang === 'en' ? 'paid − appreciation gain' : 'pagado − ganancia valorización';
+
+    // ── Chart ─────────────────────────────────────────────────────────────
+    var labels = [];
+    var rentData = [];
+    var buyData = [];
+    var diffData = [];
+    var rentR = 0, buyR = gastosFormal, prI = prima, rentMo = rentMensual, pvChart = propValue;
+
+    for (var y = 1; y <= horizon; y++) {
+      rentR += rentMo * 12;
+      prI *= (1 + investReturn);
+      rentMo *= (1 + rentIncrease);
+      var rNet = rentR - (prI - prima);
+
+      buyR += cuotaMensual * 12 + pvChart * maintPct;
+      pvChart *= (1 + appreciation);
+      var bNet = buyR - (pvChart - propValue);
+
+      labels.push((lang === 'en' ? 'Yr ' : 'Año ') + y);
+      rentData.push(Math.round(rNet));
+      buyData.push(Math.round(bNet));
+      diffData.push(Math.round(bNet - rNet)); // negative = buying cheaper
+    }
+
+    // Destroy existing chart if any
+    if (window._avcChart) {
+      try { window._avcChart.destroy(); } catch(e) {}
+    }
+    var ctx = document.getElementById('avcChart').getContext('2d');
+    window._avcChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: lang === 'en' ? 'Net cost: Rent' : 'Costo neto: Alquilar',
+            data: rentData,
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245,158,11,0.08)',
+            fill: true, tension: 0.4, pointRadius: 3, borderWidth: 2
+          },
+          {
+            label: lang === 'en' ? 'Net cost: Buy' : 'Costo neto: Comprar',
+            data: buyData,
+            borderColor: '#22c55e',
+            backgroundColor: 'rgba(34,197,94,0.08)',
+            fill: true, tension: 0.4, pointRadius: 3, borderWidth: 2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { labels: { font: { family: 'DM Sans', size: 11 }, boxWidth: 12 } },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                return ' ₡ ' + Math.abs(ctx.raw).toLocaleString('es-CR');
+              }
+            }
+          }
+        },
+        scales: {
+          x: { ticks: { font: { family: 'DM Sans', size: 10 } }, grid: { display: false } },
+          y: {
+            ticks: {
+              font: { family: 'DM Sans', size: 10 },
+              callback: function(v) {
+                return v >= 1000000 ? '₡' + (v/1000000).toFixed(0) + 'M' : '₡' + (v/1000).toFixed(0) + 'K';
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // ── Breakdown table ────────────────────────────────────────────────────
+    var breakHtml = '<table><thead><tr><th>' +
+      (lang === 'en' ? 'Year' : 'Año') + '</th><th>' +
+      (lang === 'en' ? 'Annual Rent' : 'Alquiler Anual') + '</th><th>' +
+      (lang === 'en' ? 'Cum. Rent Net' : 'Alquiler Acum. Neto') + '</th><th>' +
+      (lang === 'en' ? 'Annual Buy' : 'Cuota+Mant. Anual') + '</th><th>' +
+      (lang === 'en' ? 'Cum. Buy Net' : 'Compra Acum. Neto') + '</th><th>' +
+      (lang === 'en' ? 'Difference' : 'Diferencia') + '</th></tr></thead><tbody>';
+
+    var rentR2 = 0, buyR2 = gastosFormal, prI2 = prima, rentMo2 = rentMensual, pvB = propValue;
+    for (var y = 1; y <= horizon; y++) {
+      var annualRent = rentMo2 * 12;
+      rentR2 += annualRent;
+      prI2 *= (1 + investReturn);
+      rentMo2 *= (1 + rentIncrease);
+      var rNet2 = rentR2 - (prI2 - prima);
+
+      var annualBuy = cuotaMensual * 12 + pvB * maintPct;
+      buyR2 += annualBuy;
+      pvB *= (1 + appreciation);
+      var bNet2 = buyR2 - (pvB - propValue);
+
+      var diff = bNet2 - rNet2;
+      var isBE = breakeven === y;
+      breakHtml += '<tr' + (isBE ? ' class="breakeven-row"' : '') + '>' +
+        '<td>' + (lang === 'en' ? 'Year ' : 'Año ') + y + '</td>' +
+        '<td>' + fmt(annualRent) + '</td>' +
+        '<td>' + fmt(rNet2) + '</td>' +
+        '<td>' + fmt(annualBuy) + '</td>' +
+        '<td>' + fmt(bNet2) + '</td>' +
+        '<td style="color:' + (diff < 0 ? '#16a34a' : '#dc2626') + ';font-weight:700;">' +
+          (diff < 0 ? '▼ ' : '▲ ') + fmt(Math.abs(diff)) + '</td>' +
+        '</tr>';
+    }
+    breakHtml += '</tbody></table>';
+    document.getElementById('avc-breakdown').innerHTML = breakHtml;
+
+    // GA4 event
+    if (typeof window._gaEvent === 'function') {
+      window._gaEvent('avc_calculate', 'engagement', 'horizon_' + horizon, breakeven || 99);
+    }
+
+    // Scroll to result
+    setTimeout(function() {
+      document.getElementById('avc-result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+  };
+
+  // ── GA4: track key user interactions ──────────────────────────────────────
+  window.addEventListener('load', function() {
+    // Track when user reaches key sections (scroll-based)
+    if ('IntersectionObserver' in window && typeof window._gaEvent === 'function') {
+      var sections = [
+        { id: 'bank-grid', label: 'bank_comparator' },
+        { id: 'expo-cards-grid', label: 'expo_offers' },
+        { id: 'roi-kpi-grid', label: 'roi_analysis' },
+        { id: 'avc-card', label: 'avc_section' },
+        { id: 'pieChart', label: 'chart_distribution' }
+      ];
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) {
+            window._gaEvent('section_view', 'engagement', e.target.id, 1);
+            observer.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.3 });
+
+      sections.forEach(function(s) {
+        var el = document.getElementById(s.id);
+        if (el) observer.observe(el);
+      });
+    }
   });
 
 })();
