@@ -1,23 +1,17 @@
 {
-  "_comment": "Auto-actualizado por GitHub Actions. Costos_m2 actualizados manualmente abril 2026.",
-  "updated": "2026-04-22T00:00:00Z",
-  "source": "BCCR gee.bccr.fi.cr · FRED stlouisfed.org · Cámara de Bancos · CICSA/CJ-Arq 2026",
-  "tbp": 3.61,
-  "ted": 3.03,
+  "_comment": "Auto-actualizado por GitHub Actions. No editar manualmente.",
+  "updated": "2026-04-23T15:15:17Z",
+  "source": "BCCR(Playwright) · exchangecr · FRED · Cámara(Playwright)",
+  "tbp": 3.6,
+  "ted": 3.6,
   "tc": 458,
   "prime": 6.75,
   "sofr3": 3.67,
   "sofr6": 3.8,
-  "tri3c": 3.35,
-  "tri6c": 5.38,
-  "tri12c": 6.25,
-  "tri3d": 2.98,
-  "tri6d": 3.35,
-  "tri12d": 4.19,
-  "costos_m2": {
-    "_nota": "Costo directo de obra (materiales+mano de obra) sin honorarios ni permisos. Actualizado abr-2026 según CICSA, Batsu Architecture y CJ-Arq. Los costos reales del mercado son: Básico ₡350-420K, Intermedio ₡450-550K, Alto ₡600-900K+. Los valores aquí son conservadores (percentil 30) para estimaciones iniciales.",
-    "basico": 350000,
-    "intermedio": 450000,
-    "alto": 580000
-  }
+  "tri3c": 3.62,
+  "tri6c": 4.64,
+  "tri12c": 6.33,
+  "tri3d": 2.48,
+  "tri6d": 3.19,
+  "tri12d": 4.09
 }
